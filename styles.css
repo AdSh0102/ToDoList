@@ -18,6 +18,11 @@ body{
     border-radius: 30px;
 }
 
+#listOfToDoItems{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .listItem{
     min-height: 100px;
     padding: 0;
