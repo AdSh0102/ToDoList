@@ -148,6 +148,9 @@ function createListItem(item)
     para.style.resize = 'none';
     para.innerHTML = item.text;
     para.readOnly = 'true';
+    para.addEventListener('click', function(){
+        editTask(element.id);
+    });
 
     editButton.style.backgroundColor = 'blue';
     editButton.style.color = 'white';
