@@ -20,6 +20,50 @@ var endDateTime = document.getElementById("endDateTime");
 var log = JSON.parse(localStorage.getItem("log")) || [];
 // var clearAll = document.getElementById("clearAll");
 
+function showAllTasks() {
+    listOfToDoItems.innerHTML = "";
+    listOfItems.forEach((task) => {
+        listOfToDoItems.appendChild(createListItem(task));
+    });
+}
+
+document
+    .getElementById("showAllTasksButton")
+    .addEventListener("click", function () {
+        showAllTasks();
+    });
+
+function filterByPriority(priority) {
+    const filteredTasks = listOfItems.filter(
+        (task) => task.priority === priority
+    );
+    listOfToDoItems.innerHTML = "";
+    filteredTasks.forEach((task) => {
+        listOfToDoItems.appendChild(createListItem(task));
+    });
+}
+
+// Event listener for the "High Priority" button
+document
+    .getElementById("filterHighPriority")
+    .addEventListener("click", function () {
+        filterByPriority("High");
+    });
+
+// Event listener for the "Medium Priority" button
+document
+    .getElementById("filterMediumPriority")
+    .addEventListener("click", function () {
+        filterByPriority("Medium");
+    });
+
+// Event listener for the "Low Priority" button
+document
+    .getElementById("filterLowPriority")
+    .addEventListener("click", function () {
+        filterByPriority("Low");
+    });
+
 function logActivity(action, task) {
     const logEntry = {
         timestamp: new Date().toISOString(),
@@ -201,8 +245,8 @@ function deleteItem(id) {
     }
     listOfItems.splice(index, 1);
     render();
-	const deletedTask = listOfItems.find(item => item.id == id);
-    logActivity('Delete', deletedTask.text);
+    const deletedTask = listOfItems.find((item) => item.id == id);
+    logActivity("Delete", deletedTask.text);
 }
 
 function changeStatus(id) {
@@ -213,8 +257,8 @@ function changeStatus(id) {
         }
     }
     render();
-	const changedTask = listOfItems.find(item => item.id == id);
-    const action = changedTask.done ? 'Marked as Done' : 'Marked as Pending';
+    const changedTask = listOfItems.find((item) => item.id == id);
+    const action = changedTask.done ? "Marked as Done" : "Marked as Pending";
     logActivity(action, changedTask.text);
 }
 
@@ -225,8 +269,8 @@ function editTask(id, value) {
     }
     listOfItems[index].editing = !listOfItems[index].editing;
     render();
-	const editedTask = listOfItems.find(item => item.id == id);
-    logActivity('Edit', `Edited "${editedTask.text}" to "${value}"`);
+    const editedTask = listOfItems.find((item) => item.id == id);
+    logActivity("Edit", `Edited "${editedTask.text}" to "${value}"`);
 }
 
 function formatDateToDatetimeLocal(date) {
@@ -246,9 +290,11 @@ function changeDueDate(value, id) {
         }
     }
     render();
-	const changedTask = listOfItems.find(item => item.id == id);
-    logActivity('Due Date Change', `"${changedTask.text}" due date changed to "${value}"`);
-  }
+    const changedTask = listOfItems.find((item) => item.id == id);
+    logActivity(
+        "Due Date Change",
+        `"${changedTask.text}" due date changed to "${value}"`
+    );
 }
 
 function changeSortingAlgo() {
@@ -265,8 +311,11 @@ function changePriority(value, id) {
         }
     }
     render();
-	const changedTask = listOfItems.find(item => item.id == id);
-    logActivity('Priority Change', `"${changedTask.text}" priority changed to "${value}"`);
+    const changedTask = listOfItems.find((item) => item.id == id);
+    logActivity(
+        "Priority Change",
+        `"${changedTask.text}" priority changed to "${value}"`
+    );
 }
 
 function addCategoryToItem(val, id) {
@@ -278,8 +327,11 @@ function addCategoryToItem(val, id) {
         }
     }
     render();
-	const changedTask = listOfItems.find(item => item.id == id);
-    logActivity('Category Added', `"${val}" category added to "${changedTask.text}"`);
+    const changedTask = listOfItems.find((item) => item.id == id);
+    logActivity(
+        "Category Added",
+        `"${val}" category added to "${changedTask.text}"`
+    );
 }
 
 function addTagToItem(val, id) {
@@ -291,8 +343,8 @@ function addTagToItem(val, id) {
         }
     }
     render();
-	const changedTask = listOfItems.find(item => item.id == id);
-    logActivity('Tag Added', `"${val}" tag added to "${changedTask.text}"`);
+    const changedTask = listOfItems.find((item) => item.id == id);
+    logActivity("Tag Added", `"${val}" tag added to "${changedTask.text}"`);
 }
 
 // function to create a new To Do List item
@@ -462,5 +514,6 @@ function newItem(val, priorityVal, dueDateVal) {
     count += 1;
     listOfItems.push(newItem);
     render();
+    logActivity("Add", `"${val}" task added.`);
     newItemTextBox.value = "";
 }
