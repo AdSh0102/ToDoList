@@ -6,9 +6,14 @@ var newItemTextBox = document.getElementById("newToDoItem");
 var listOfToDoItems = document.getElementById("listOfToDoItems");
 var newItemPriority = document.getElementById("priorityList");
 var newItemDueDate = document.getElementById("dueDate");
-var sortingFunction = dueDateSortingFunction;
+var sortingFunction = prioritySortingfunction;
 var priorityTable = { High: 1, Low: -1, Medium: 0 };
-
+var filterTags = [];
+var filterCategories = [];
+var pendingOnlyButton = document.getElementById("pendingOnly");
+var displayAllTasks = document.getElementById("displayAllTasks");
+var displayMissedTasks = document.getElementById("displayMissedTasks");
+var filterToDoItems = {missed:false, pending:false};
 listOfItems = getlistOfItemsFromLocalStorage();
 render();
 count = listOfItems.length + 1;
@@ -16,6 +21,18 @@ count = listOfItems.length + 1;
 function newItemToAdd() {
     newItem(newItemTextBox.value, priorityList.value, newItemDueDate.value);
 }
+
+pendingOnlyButton.addEventListener('click', function() {
+	renderPending();
+});
+
+displayAllTasks.addEventListener('click', function() {
+	renderAll();
+});
+
+displayMissedTasks.addEventListener('click', function() {
+	renderMissedTasks();
+});
 
 submitButton.addEventListener("click", function () {
     newItemToAdd();
@@ -68,7 +85,7 @@ newItemTextBox.addEventListener(
 
 // Function to retrieve the listOfItems from Local Storage
 function getlistOfItemsFromLocalStorage() {
-    const storedList = localStorage.getItem("listOfItems");
+    var storedList = localStorage.getItem("listOfItems");
     return storedList ? JSON.parse(storedList) : [];
 }
 
@@ -90,10 +107,31 @@ function dueDateSortingFunction(a, b) {
     return a.dueDate < b.dueDate ? -1 : 1;
 }
 
+function renderAll(){
+	filterToDoItems['pending'] = false;
+	filterToDoItems['missed'] = false;
+	render();
+}
+
+function renderMissedTasks() {
+	filterToDoItems['missed'] = !filterToDoItems['missed'];
+	render();
+}
+
+function renderPending() {
+    filterToDoItems['pending'] = !filterToDoItems['pending'];
+	render();
+}
+
 function render() {
+	var currDateTime = formatDateToDatetimeLocal(new Date());
     listOfToDoItems.innerHTML = "";
     listOfItems.sort(sortingFunction);
     for (var i = 0; i < listOfItems.length; ++i) {
+		if(filterToDoItems['missed'] && (listOfItems[i].done || listOfItems[i].dueDate > currDateTime))
+			continue;
+		if(filterToDoItems['pending'] && listOfItems[i].done)	
+			continue;
         listOfToDoItems.appendChild(createListItem(listOfItems[i]));
     }
     saveListOfItemsToLocalStorage();
@@ -108,14 +146,7 @@ function deleteItem(id) {
     render();
 }
 
-function changeStatus(elem, id) {
-    if (elem.style.backgroundColor == "green") {
-        elem.style.backgroundColor = "red";
-        elem.innerHTML = "Pending";
-    } else {
-        elem.style.backgroundColor = "green";
-        elem.innerHTML = "Done";
-    }
+function changeStatus(id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
             listOfItems[i].done = !listOfItems[i].done;
@@ -125,24 +156,12 @@ function changeStatus(elem, id) {
     render();
 }
 
-function editTask(id) {
-    var editButton = document
-        .getElementById(id)
-        .getElementsByTagName("button")[2];
-    var para = document.getElementById(id).getElementsByTagName("textarea")[0];
-    para.focus();
-    if (editButton.innerHTML == "Save") {
-        editButton.style.backgroundColor = "blue";
-        editButton.innerHTML = "Edit";
-        para.readOnly = true;
-        // para.editing = true;
-        return;
-    }
-
-    editButton.style.backgroundColor = "grey";
-    editButton.innerHTML = "Save";
-    para.readOnly = false;
-    // para.editing = false;
+function editTask(id, value) {
+	var index = listOfItems.findIndex(item => item.id === id);
+	if(listOfItems[index].editing){
+		listOfItems[index].text = value;
+	}
+	listOfItems[index].editing = !listOfItems[index].editing;
     render();
 }
 
@@ -160,9 +179,18 @@ function changeDueDate(value, id){
 	for(var i=0;i<listOfItems.length;++i){
 		if(listOfItems[i].id == id){
 			listOfItems[i].dueDate = value;
-			return;
 		}
 	}
+	render();
+}
+
+function changePriority(value, id){
+	for(var i=0;i<listOfItems.length;++i){
+		if(listOfItems[i].id == id){
+			listOfItems[i].priority = value;
+		}
+	}
+	render();
 }
 
 function addCategoryToItem(val, id){
@@ -246,17 +274,15 @@ function createListItem(item) {
     element.appendChild(addCategoryBox);
     element.appendChild(addTagBox);
 
-    dueDate.type = "datetime-local";
-    dueDate.value = item.dueDate;
-    dueDate.readOnly = false;
-    dueDate.id = "dueDate";
-
     element.className = "listItem";
     element.id = "listItemNo" + String(item.id);
 
+	dueDate.type = "datetime-local";
+    dueDate.value = item.dueDate;
+    dueDate.readOnly = false;
+    dueDate.id = "dueDate";
     dueDate.addEventListener("change", function () {
         changeDueDate(dueDate.value, item.id);
-		render();
     });
 
     delButton.style.backgroundColor = "black";
@@ -272,7 +298,7 @@ function createListItem(item) {
     if (item.done) doneButton.innerHTML = "Done";
     else doneButton.innerHTML = "Pending";
     doneButton.addEventListener("click", function () {
-        changeStatus(doneButton, item.id);
+        changeStatus(item.id);
     });
 
     para.style.backgroundColor = "#87ACA3";
@@ -284,18 +310,20 @@ function createListItem(item) {
     para.style.border = "5px solid transparent";
     para.style.resize = "none";
     para.innerHTML = item.text;
-    para.readOnly = "true";
-    para.editing = false;
-    para.addEventListener("click", function () {
-        if (editButton.innerHTML == "Save") return;
-        editTask(element.id);
-    });
 
-    editButton.style.backgroundColor = "blue";
-    editButton.style.color = "white";
-    editButton.innerHTML = "Edit";
+	editButton.style.color = "white";
+	if (item.editing) {
+        para.readOnly = false;
+        editButton.style.backgroundColor = "grey";
+        editButton.innerHTML = "Save";
+        para.focus(); // Add this line to focus on the textarea when in editing mode
+    } else {
+        para.readOnly = true;
+        editButton.style.backgroundColor = "blue";
+        editButton.innerHTML = "Edit";
+    }
     editButton.addEventListener("click", function () {
-        editTask(element.id);
+        editTask(item.id, para.value);
     });
 
     buttons.style.width = "100%";
@@ -315,6 +343,9 @@ function createListItem(item) {
     priorityList.appendChild(mediumOption);
     priorityList.appendChild(lowOption);
     priorityList.value = item.priority;
+	priorityList.addEventListener("change", function () {
+        changePriority(priorityList.value, item.id);
+    });
 
     if (priorityList.value == "Low") {
         element.style.backgroundColor = "lightblue";
@@ -346,6 +377,7 @@ function newItem(val, priorityVal, dueDateVal) {
         dueDate: dueDateVal,
 		tags:[],
 		categories:[],
+		editing: false,
     };
     count += 1;
     listOfItems.push(newItem);
