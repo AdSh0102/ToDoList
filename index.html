@@ -1,71 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
-    <title>To Do List</title>
-  </head>
-  <body>
-    <h1>To Do List</h1>
-    <div style="margin: 20px">
-      <input
-        placeholder="Enter a task"
-        class="form-control-lg"
-        type="text"
-        id="newToDoItem"
-      />
-      <label for="priorityList">set priority:</label>
-      <select id="priorityList" name="priorityList">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low" selected>Low</option>
-      </select>
-      <label for="dueDate">set due date:</label>
-      <input type="datetime-local" id="dueDate"></input>
-      <button
-        style="font-size: x-small"
-        class="btn-lg btn-success btn btn-primary"
-        type="submit"
-        id="submitButton"
-      >
-        Press to submit
-      </button>
-      <div>
-        <button id="filterHighPriority">High Priority</button>
-        <button id="filterMediumPriority">Medium Priority</button>
-        <button id="filterLowPriority">Low Priority</button>
-        <button id="showAllTasksButton">Show All Tasks</button>
-      </div>
-      
-      <!-- <button id="clearAll">erase everything</button> -->
-    </div>
-    <div id="encase">
-      <div>
-        <select id="sortTasksBy" name="sortTasksBy">
-          <option value="">Sort tasks according to</option>
-          <option value="Priority">Priority</option>
-          <option value="Due Date">Due Date</option>
-        </select>
-        <label for="startDateTime">enter start date:</label>
-        <input type="datetime-local" id="startDateTime"></input>
-        <label for="endDateTime">enter end date:</label>
-        <input type="datetime-local" id="endDateTime"></input>
-        <label for="filterTasksByCategories">enter categories to filter by:</label>
-        <input id="filterTasksByCategories" name="filterTasksByCategories"></input>
-        </select>
-        <button id="pendingOnly">Show pending only</button>
-        <button id="displayAllTasks">Show all tasks</button>
-        <button id="displayMissedTasks">Show missed tasks</button>
-      </div>
-      <div id="listOfToDoItems"></div>
-    </div>
-    <script src="script.js"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="styles.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous"
+        />
+        <title>To Do List</title>
+    </head>
+    <body>
+        <h1>To Do List</h1>
+        <div style="margin: 20px">
+            <input
+                placeholder="Enter a task"
+                class="form-control-lg"
+                type="text"
+                id="newToDoItem"
+            />
+            <label for="priorityList">set priority:</label>
+            <select id="priorityList" name="priorityList">
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low" selected>Low</option>
+            </select>
+            <label for="dueDate">set due date:</label>
+            <input type="datetime-local" id="dueDate" />
+            <button
+                style="font-size: x-small"
+                class="btn-lg btn-success btn btn-primary"
+                type="submit"
+                id="submitButton"
+            >
+                Press to submit
+            </button>
+            <div>
+                <button id="filterHighPriority">High Priority</button>
+                <button id="filterMediumPriority">Medium Priority</button>
+                <button id="filterLowPriority">Low Priority</button>
+                <button id="showAllTasksButton">Show All Tasks</button>
+            </div>
+
+            <!-- <button id="clearAll">erase everything</button> -->
+        </div>
+        <div id="encase">
+            <div>
+                <select id="sortTasksBy" name="sortTasksBy">
+                    <option value="">Sort tasks according to</option>
+                    <option value="Priority">Priority</option>
+                    <option value="Due Date">Due Date</option>
+                </select>
+                <label for="startDateTime">enter start date:</label>
+                <input type="datetime-local" id="startDateTime" />
+                <label for="endDateTime">enter end date:</label>
+                <input type="datetime-local" id="endDateTime" />
+                <!-- <label for="filterTasksByCategories"
+                    >enter categories to filter by:</label
+                >
+                <input
+                    id="filterTasksByCategories"
+                    name="filterTasksByCategories"
+                /> -->
+                <button id="pendingOnly">Show pending only</button>
+                <button id="displayAllTasks">Show all tasks</button>
+                <button id="displayMissedTasks">Show missed tasks</button>
+            </div>
+            <div id="listOfToDoItems"></div>
+        </div>
+        <script src="script.js"></script>
+    </body>
 </html>
