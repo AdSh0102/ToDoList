@@ -2,12 +2,12 @@ var count = 1;
 var regex = /^\s*$/;
 var submitButton = document.getElementById("submitButton");
 var newItemTextBox = document.getElementById("newToDoItem");
-var newItemTextBox = document.getElementById("newToDoItem");
 var listOfToDoItems = document.getElementById("listOfToDoItems");
 var newItemPriority = document.getElementById("priorityList");
 var newItemDueDate = document.getElementById("dueDate");
 var sortingFunction = prioritySortingfunction;
 var priorityTable = { High: 1, Low: -1, Medium: 0 };
+var currDateTime = formatDateToDatetimeLocal(new Date());
 var filterTags = [];
 var filterCategories = [];
 var pendingOnlyButton = document.getElementById("pendingOnly");
@@ -15,6 +15,23 @@ var displayAllTasks = document.getElementById("displayAllTasks");
 var displayMissedTasks = document.getElementById("displayMissedTasks");
 var filterToDoItems = {missed:false, pending:false};
 var sortingAlgoSelection = document.getElementById("sortTasksBy");
+var startDateTime = document.getElementById("startDateTime");
+var endDateTime = document.getElementById("endDateTime");
+// var clearAll = document.getElementById("clearAll");
+
+// clearAll.addEventListener("click", function(){
+// 	listOfItems = [];
+// 	localStorage.clear();
+// 	newItemTextBox = "";
+// 	newItemPriority.value = "Low";
+// 	filterCategories = [];
+// 	filterTags = [];
+// 	count = 1
+// 	sortingAlgoSelection = prioritySortingfunction;
+// 	filterToDoItems = {missed:false, pending:false};
+// 	render();
+// });
+
 listOfItems = getlistOfItemsFromLocalStorage();
 render();
 count = listOfItems.length + 1;
@@ -25,6 +42,14 @@ function newItemToAdd() {
 
 pendingOnlyButton.addEventListener('click', function() {
 	renderPending();
+});
+
+startDateTime.addEventListener("change", function () {
+	render();
+});
+
+endDateTime.addEventListener("change", function () {
+	render();
 });
 
 sortingAlgoSelection.addEventListener("change", function () {
@@ -130,7 +155,7 @@ function renderPending() {
 }
 
 function render() {
-	var currDateTime = formatDateToDatetimeLocal(new Date());
+	currDateTime = formatDateToDatetimeLocal(new Date());
     listOfToDoItems.innerHTML = "";
     listOfItems.sort(sortingFunction);
     for (var i = 0; i < listOfItems.length; ++i) {
@@ -138,7 +163,14 @@ function render() {
 			continue;
 		if(filterToDoItems['pending'] && listOfItems[i].done)	
 			continue;
-        listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+		if(startDateTime.value=='' && endDateTime.value=='')
+        	listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+		else if(startDateTime.value=='' && endDateTime.value >= currDateTime)
+			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+		else if(endDateTime.value=='' && startDateTime.value <= currDateTime)
+			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+		else if(startDateTime.value <= currDateTime && endDateTime.value >= currDateTime)
+			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
     }
     saveListOfItemsToLocalStorage();
 }
