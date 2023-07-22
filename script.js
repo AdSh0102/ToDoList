@@ -14,6 +14,7 @@ var pendingOnlyButton = document.getElementById("pendingOnly");
 var displayAllTasks = document.getElementById("displayAllTasks");
 var displayMissedTasks = document.getElementById("displayMissedTasks");
 var filterToDoItems = {missed:false, pending:false};
+var sortingAlgoSelection = document.getElementById("sortTasksBy");
 listOfItems = getlistOfItemsFromLocalStorage();
 render();
 count = listOfItems.length + 1;
@@ -24,6 +25,11 @@ function newItemToAdd() {
 
 pendingOnlyButton.addEventListener('click', function() {
 	renderPending();
+});
+
+sortingAlgoSelection.addEventListener("change", function () {
+	changeSortingAlgo();
+	render();
 });
 
 displayAllTasks.addEventListener('click', function() {
@@ -181,6 +187,14 @@ function changeDueDate(value, id){
 			listOfItems[i].dueDate = value;
 		}
 	}
+	render();
+}
+
+function changeSortingAlgo(){
+	if(sortingAlgoSelection.value == "Due Date")
+		sortingFunction = dueDateSortingFunction;
+	else
+		sortingFunction = prioritySortingfunction;
 	render();
 }
 
