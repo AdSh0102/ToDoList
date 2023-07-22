@@ -13,11 +13,25 @@ var filterCategories = [];
 var pendingOnlyButton = document.getElementById("pendingOnly");
 var displayAllTasks = document.getElementById("displayAllTasks");
 var displayMissedTasks = document.getElementById("displayMissedTasks");
-var filterToDoItems = {missed:false, pending:false};
+var filterToDoItems = { missed: false, pending: false };
 var sortingAlgoSelection = document.getElementById("sortTasksBy");
 var startDateTime = document.getElementById("startDateTime");
 var endDateTime = document.getElementById("endDateTime");
+var log = JSON.parse(localStorage.getItem("log")) || [];
 // var clearAll = document.getElementById("clearAll");
+
+function logActivity(action, task) {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        action,
+        task,
+    };
+
+    // Store log in local storage
+    const log = JSON.parse(localStorage.getItem("log")) || [];
+    log.push(logEntry);
+    localStorage.setItem("log", JSON.stringify(log));
+}
 
 // clearAll.addEventListener("click", function(){
 // 	listOfItems = [];
@@ -40,29 +54,29 @@ function newItemToAdd() {
     newItem(newItemTextBox.value, priorityList.value, newItemDueDate.value);
 }
 
-pendingOnlyButton.addEventListener('click', function() {
-	renderPending();
+pendingOnlyButton.addEventListener("click", function () {
+    renderPending();
 });
 
 startDateTime.addEventListener("change", function () {
-	render();
+    render();
 });
 
 endDateTime.addEventListener("change", function () {
-	render();
+    render();
 });
 
 sortingAlgoSelection.addEventListener("change", function () {
-	changeSortingAlgo();
-	render();
+    changeSortingAlgo();
+    render();
 });
 
-displayAllTasks.addEventListener('click', function() {
-	renderAll();
+displayAllTasks.addEventListener("click", function () {
+    renderAll();
 });
 
-displayMissedTasks.addEventListener('click', function() {
-	renderMissedTasks();
+displayMissedTasks.addEventListener("click", function () {
+    renderMissedTasks();
 });
 
 submitButton.addEventListener("click", function () {
@@ -138,39 +152,44 @@ function dueDateSortingFunction(a, b) {
     return a.dueDate < b.dueDate ? -1 : 1;
 }
 
-function renderAll(){
-	filterToDoItems['pending'] = false;
-	filterToDoItems['missed'] = false;
-	render();
+function renderAll() {
+    filterToDoItems["pending"] = false;
+    filterToDoItems["missed"] = false;
+    render();
 }
 
 function renderMissedTasks() {
-	filterToDoItems['missed'] = !filterToDoItems['missed'];
-	render();
+    filterToDoItems["missed"] = !filterToDoItems["missed"];
+    render();
 }
 
 function renderPending() {
-    filterToDoItems['pending'] = !filterToDoItems['pending'];
-	render();
+    filterToDoItems["pending"] = !filterToDoItems["pending"];
+    render();
 }
 
 function render() {
-	currDateTime = formatDateToDatetimeLocal(new Date());
+    currDateTime = formatDateToDatetimeLocal(new Date());
     listOfToDoItems.innerHTML = "";
     listOfItems.sort(sortingFunction);
     for (var i = 0; i < listOfItems.length; ++i) {
-		if(filterToDoItems['missed'] && (listOfItems[i].done || listOfItems[i].dueDate > currDateTime))
-			continue;
-		if(filterToDoItems['pending'] && listOfItems[i].done)	
-			continue;
-		if(startDateTime.value=='' && endDateTime.value=='')
-        	listOfToDoItems.appendChild(createListItem(listOfItems[i]));
-		else if(startDateTime.value=='' && endDateTime.value >= currDateTime)
-			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
-		else if(endDateTime.value=='' && startDateTime.value <= currDateTime)
-			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
-		else if(startDateTime.value <= currDateTime && endDateTime.value >= currDateTime)
-			listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+        if (
+            filterToDoItems["missed"] &&
+            (listOfItems[i].done || listOfItems[i].dueDate > currDateTime)
+        )
+            continue;
+        if (filterToDoItems["pending"] && listOfItems[i].done) continue;
+        if (startDateTime.value == "" && endDateTime.value == "")
+            listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+        else if (startDateTime.value == "" && endDateTime.value >= currDateTime)
+            listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+        else if (endDateTime.value == "" && startDateTime.value <= currDateTime)
+            listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+        else if (
+            startDateTime.value <= currDateTime &&
+            endDateTime.value >= currDateTime
+        )
+            listOfToDoItems.appendChild(createListItem(listOfItems[i]));
     }
     saveListOfItemsToLocalStorage();
 }
@@ -182,6 +201,8 @@ function deleteItem(id) {
     }
     listOfItems.splice(index, 1);
     render();
+	const deletedTask = listOfItems.find(item => item.id == id);
+    logActivity('Delete', deletedTask.text);
 }
 
 function changeStatus(id) {
@@ -192,15 +213,20 @@ function changeStatus(id) {
         }
     }
     render();
+	const changedTask = listOfItems.find(item => item.id == id);
+    const action = changedTask.done ? 'Marked as Done' : 'Marked as Pending';
+    logActivity(action, changedTask.text);
 }
 
 function editTask(id, value) {
-	var index = listOfItems.findIndex(item => item.id === id);
-	if(listOfItems[index].editing){
-		listOfItems[index].text = value;
-	}
-	listOfItems[index].editing = !listOfItems[index].editing;
+    var index = listOfItems.findIndex((item) => item.id === id);
+    if (listOfItems[index].editing) {
+        listOfItems[index].text = value;
+    }
+    listOfItems[index].editing = !listOfItems[index].editing;
     render();
+	const editedTask = listOfItems.find(item => item.id == id);
+    logActivity('Edit', `Edited "${editedTask.text}" to "${value}"`);
 }
 
 function formatDateToDatetimeLocal(date) {
@@ -213,52 +239,60 @@ function formatDateToDatetimeLocal(date) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-function changeDueDate(value, id){
-	for(var i=0;i<listOfItems.length;++i){
-		if(listOfItems[i].id == id){
-			listOfItems[i].dueDate = value;
-		}
-	}
-	render();
+function changeDueDate(value, id) {
+    for (var i = 0; i < listOfItems.length; ++i) {
+        if (listOfItems[i].id == id) {
+            listOfItems[i].dueDate = value;
+        }
+    }
+    render();
+	const changedTask = listOfItems.find(item => item.id == id);
+    logActivity('Due Date Change', `"${changedTask.text}" due date changed to "${value}"`);
+  }
 }
 
-function changeSortingAlgo(){
-	if(sortingAlgoSelection.value == "Due Date")
-		sortingFunction = dueDateSortingFunction;
-	else
-		sortingFunction = prioritySortingfunction;
-	render();
+function changeSortingAlgo() {
+    if (sortingAlgoSelection.value == "Due Date")
+        sortingFunction = dueDateSortingFunction;
+    else sortingFunction = prioritySortingfunction;
+    render();
 }
 
-function changePriority(value, id){
-	for(var i=0;i<listOfItems.length;++i){
-		if(listOfItems[i].id == id){
-			listOfItems[i].priority = value;
-		}
-	}
-	render();
+function changePriority(value, id) {
+    for (var i = 0; i < listOfItems.length; ++i) {
+        if (listOfItems[i].id == id) {
+            listOfItems[i].priority = value;
+        }
+    }
+    render();
+	const changedTask = listOfItems.find(item => item.id == id);
+    logActivity('Priority Change', `"${changedTask.text}" priority changed to "${value}"`);
 }
 
-function addCategoryToItem(val, id){
-	if (regex.test(val)) return;
-	for(var i=0;i<listOfItems.length;++i){
-		if(listOfItems[i].id == id){
-			listOfItems[i].categories.push(val);
-			return;
-		}
-	}
-	render();
+function addCategoryToItem(val, id) {
+    if (regex.test(val)) return;
+    for (var i = 0; i < listOfItems.length; ++i) {
+        if (listOfItems[i].id == id) {
+            listOfItems[i].categories.push(val);
+            return;
+        }
+    }
+    render();
+	const changedTask = listOfItems.find(item => item.id == id);
+    logActivity('Category Added', `"${val}" category added to "${changedTask.text}"`);
 }
 
-function addTagToItem(val, id){
-	if (regex.test(val)) return;
-	for(var i=0;i<listOfItems.length;++i){
-		if(listOfItems[i].id == id){
-			listOfItems[i].tags.push(val);
-			return;
-		}
-	}
-	render();
+function addTagToItem(val, id) {
+    if (regex.test(val)) return;
+    for (var i = 0; i < listOfItems.length; ++i) {
+        if (listOfItems[i].id == id) {
+            listOfItems[i].tags.push(val);
+            return;
+        }
+    }
+    render();
+	const changedTask = listOfItems.find(item => item.id == id);
+    logActivity('Tag Added', `"${val}" tag added to "${changedTask.text}"`);
 }
 
 // function to create a new To Do List item
@@ -278,31 +312,31 @@ function createListItem(item) {
 
     addCategoryBox.type = "text";
     addCategoryBox.placeholder = "add category";
-	addCategoryBox.addEventListener(
-		"keydown",
-		(event) => {
-			var name = event.key;
-			if (name == "Enter") {
-				addCategoryToItem(addCategoryBox.value, item.id);
-				addCategoryBox.value = "";
-			}
-		},
-		false
-	);
+    addCategoryBox.addEventListener(
+        "keydown",
+        (event) => {
+            var name = event.key;
+            if (name == "Enter") {
+                addCategoryToItem(addCategoryBox.value, item.id);
+                addCategoryBox.value = "";
+            }
+        },
+        false
+    );
 
     addTagBox.type = "text";
     addTagBox.placeholder = "add tag";
-	addTagBox.addEventListener(
-		"keydown",
-		(event) => {
-			var name = event.key;
-			if (name == "Enter") {
-				addTagToItem(addTagBox.value, item.id);
-				addTagBox.value = "";
-			}
-		},
-		false
-	);
+    addTagBox.addEventListener(
+        "keydown",
+        (event) => {
+            var name = event.key;
+            if (name == "Enter") {
+                addTagToItem(addTagBox.value, item.id);
+                addTagBox.value = "";
+            }
+        },
+        false
+    );
 
     dueDateDiv.appendChild(dueDateLabel);
     dueDateDiv.append(dueDate);
@@ -323,7 +357,7 @@ function createListItem(item) {
     element.className = "listItem";
     element.id = "listItemNo" + String(item.id);
 
-	dueDate.type = "datetime-local";
+    dueDate.type = "datetime-local";
     dueDate.value = item.dueDate;
     dueDate.readOnly = false;
     dueDate.id = "dueDate";
@@ -357,8 +391,8 @@ function createListItem(item) {
     para.style.resize = "none";
     para.innerHTML = item.text;
 
-	editButton.style.color = "white";
-	if (item.editing) {
+    editButton.style.color = "white";
+    if (item.editing) {
         para.readOnly = false;
         editButton.style.backgroundColor = "grey";
         editButton.innerHTML = "Save";
@@ -389,7 +423,7 @@ function createListItem(item) {
     priorityList.appendChild(mediumOption);
     priorityList.appendChild(lowOption);
     priorityList.value = item.priority;
-	priorityList.addEventListener("change", function () {
+    priorityList.addEventListener("change", function () {
         changePriority(priorityList.value, item.id);
     });
 
@@ -421,9 +455,9 @@ function newItem(val, priorityVal, dueDateVal) {
         done: false,
         priority: priorityVal,
         dueDate: dueDateVal,
-		tags:[],
-		categories:[],
-		editing: false,
+        tags: [],
+        categories: [],
+        editing: false,
     };
     count += 1;
     listOfItems.push(newItem);
