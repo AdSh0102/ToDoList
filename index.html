@@ -29,14 +29,33 @@
       >
         Press to submit
       </button>
+      <label for="priorityList">set priority:</label>
       <select id="priorityList" name="priorityList">
         <option value="High">High</option>
         <option value="Medium">Medium</option>
         <option value="Low" selected>Low</option>
       </select>
-      <!-- <input type="date">Enter Due Date</input> -->
+      <label for="dueDate">set due date:</label>
+      <input type="date" id="dueDate"></input>
     </div>
     <div id="encase">
+      <div>
+        <select id="sortTasksBy" name="sortTasksBy">
+          <option value="">Sort tasks according to</option>
+          <option value="Priority">Priority</option>
+          <option value="Due Date">Due Date</option>
+        </select>
+        <label for="startDateTime">enter start date:</label>
+        <input type="date" id="startDateTime"></input>
+        <label for="endDateTime">enter end date:</label>
+        <input type="date" id="endDateTime"></input>
+        <label for="filterTasksByTags">enter tag(s) to filter by:</label>
+        <select id="filterTasksByTags" name="filterTasksByTags">
+        </select>
+        <label for="filterTasksByCategories">enter categories to filter by:</label>
+        <select id="filterTasksByCategories" name="filterTasksByCategories">
+        </select>
+      </div>
       <div id="listOfToDoItems"></div>
     </div>
     <script src="script.js"></script>
