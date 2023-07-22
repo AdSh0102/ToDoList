@@ -4,16 +4,21 @@ var submitButton = document.getElementById("submitButton");
 var newItemTextBox = document.getElementById("newToDoItem");
 var newItemTextBox = document.getElementById("newToDoItem");
 var listOfToDoItems = document.getElementById("listOfToDoItems");
-var priorityList = document.getElementById("priorityList");
-var sortingFunction = prioritySortingfunction;
-
+var newItemPriority = document.getElementById("priorityList");
+var newItemDueDate = document.getElementById("dueDate");
+var sortingFunction = dueDateSortingFunction;
 var priorityTable = { High: 1, Low: -1, Medium: 0 };
 
 listOfItems = getlistOfItemsFromLocalStorage();
 render();
+count = listOfItems.length + 1;
+
+function newItemToAdd() {
+    newItem(newItemTextBox.value, priorityList.value, newItemDueDate.value);
+}
 
 submitButton.addEventListener("click", function () {
-    newItem(newItemTextBox.value, priorityList.value);
+    newItemToAdd();
 });
 
 newItemTextBox.addEventListener(
@@ -21,20 +26,18 @@ newItemTextBox.addEventListener(
     (event) => {
         var name = event.key;
         if (name == "Enter") {
-            newItem(newItemTextBox.value, priorityList.value);
+            newItemToAdd();
         }
     },
     false
 );
 
-const sortTaksBySelection = document.getElementById("sortTasksBy");
-
-sortTaksBySelection.addEventListener("change", function () {
-    const selectedOption = sortTaksBySelection.value;
-    if (selectedOption == "Priority") sortingFunction = prioritySortingfunction;
-    else sortingFunction = dueDateSortingFunction;
-    render();
-});
+// sortTasksBySelection.addEventListener("change", function () {
+//     const selectedOption = sortTaksBySelection.value;
+//     if (selectedOption == "Priority") sortingFunction = prioritySortingfunction;
+//     else sortingFunction = dueDateSortingFunction;
+//     render();
+// });
 
 // API call to add a lot of tasks
 // fetch("https://jsonplaceholder.typicode.com/todos")
@@ -84,7 +87,7 @@ function prioritySortingfunction(a, b) {
 
 function dueDateSortingFunction(a, b) {
     if (a.done != b.done) return a.done ? 1 : -1;
-    return a.dueDate > b.dueDate ? -1 : 1;
+    return a.dueDate < b.dueDate ? -1 : 1;
 }
 
 function render() {
@@ -102,7 +105,6 @@ function deleteItem(id) {
         if (listOfItems[i].id == id) index = i;
     }
     listOfItems.splice(index, 1);
-    listOfToDoItems.innerHTML = "";
     render();
 }
 
@@ -144,6 +146,48 @@ function editTask(id) {
     render();
 }
 
+function formatDateToDatetimeLocal(date) {
+    const year = date.getFullYear().toString().padStart(4, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function changeDueDate(value, id){
+	for(var i=0;i<listOfItems.length;++i){
+		if(listOfItems[i].id == id){
+			listOfItems[i].dueDate = value;
+			return;
+		}
+	}
+}
+
+function addCategoryToItem(val, id){
+	if (regex.test(val)) return;
+	for(var i=0;i<listOfItems.length;++i){
+		if(listOfItems[i].id == id){
+			listOfItems[i].categories.push(val);
+			return;
+		}
+	}
+	render();
+}
+
+function addTagToItem(val, id){
+	if (regex.test(val)) return;
+	for(var i=0;i<listOfItems.length;++i){
+		if(listOfItems[i].id == id){
+			listOfItems[i].tags.push(val);
+			return;
+		}
+	}
+	render();
+}
+
+// function to create a new To Do List item
 function createListItem(item) {
     var element = document.createElement("div");
     var para = document.createElement("textarea");
@@ -152,8 +196,44 @@ function createListItem(item) {
     var delButton = document.createElement("button");
     var doneButton = document.createElement("button");
     var editButton = document.createElement("button");
-	var dueDate = new Date(document.getElementById("dueDate").value);
-	// console.log(dueDate);
+    var dueDateDiv = document.createElement("div");
+    var dueDate = document.createElement("input");
+    var dueDateLabel = document.createElement("label");
+    var addCategoryBox = document.createElement("input");
+    var addTagBox = document.createElement("input");
+
+    addCategoryBox.type = "text";
+    addCategoryBox.placeholder = "add category";
+	addCategoryBox.addEventListener(
+		"keydown",
+		(event) => {
+			var name = event.key;
+			if (name == "Enter") {
+				addCategoryToItem(addCategoryBox.value, item.id);
+				addCategoryBox.value = "";
+			}
+		},
+		false
+	);
+
+    addTagBox.type = "text";
+    addTagBox.placeholder = "add tag";
+	addTagBox.addEventListener(
+		"keydown",
+		(event) => {
+			var name = event.key;
+			if (name == "Enter") {
+				addTagToItem(addTagBox.value, item.id);
+				addTagBox.value = "";
+			}
+		},
+		false
+	);
+
+    dueDateDiv.appendChild(dueDateLabel);
+    dueDateDiv.append(dueDate);
+    dueDateLabel.setAttribute("for", "dueDate");
+    dueDateLabel.innerHTML = "Due Date for this task: ";
 
     buttons.appendChild(delButton);
     buttons.appendChild(doneButton);
@@ -162,9 +242,22 @@ function createListItem(item) {
 
     element.appendChild(para);
     element.appendChild(buttons);
+    element.appendChild(dueDateDiv);
+    element.appendChild(addCategoryBox);
+    element.appendChild(addTagBox);
+
+    dueDate.type = "datetime-local";
+    dueDate.value = item.dueDate;
+    dueDate.readOnly = false;
+    dueDate.id = "dueDate";
 
     element.className = "listItem";
     element.id = "listItemNo" + String(item.id);
+
+    dueDate.addEventListener("change", function () {
+        changeDueDate(dueDate.value, item.id);
+		render();
+    });
 
     delButton.style.backgroundColor = "black";
     delButton.style.color = "white";
@@ -230,35 +323,32 @@ function createListItem(item) {
     } else {
         element.style.backgroundColor = "#87ACA3";
     }
+
     return element;
 }
 
+// function to add a new item to the toDo List
 function newItem(val, priorityVal, dueDateVal) {
     if (regex.test(val)) return;
+    if (dueDateVal == "") {
+        const currentDate = new Date();
+        // ... Calculate the due date ...
+        const dueDateObject = new Date(currentDate);
+        dueDateObject.setDate(dueDateObject.getDate() + 7);
+        const formattedDueDate = formatDateToDatetimeLocal(dueDateObject);
+        dueDateVal = formattedDueDate;
+    }
     var newItem = {
         id: count,
         text: val,
         done: false,
         priority: priorityVal,
         dueDate: dueDateVal,
+		tags:[],
+		categories:[],
     };
     count += 1;
     listOfItems.push(newItem);
     render();
     newItemTextBox.value = "";
 }
-
-// Assignment 3 -
-// Todo list
-// maintain a list of todo items  - keep a array in memory - [{ taskDetails : "do homework", id : 1}, { taskDetails : "sleep", id : 2}]
-// function to add to the array
-// function to remove a particular element in the array
-
-// UI -
-// text box with save button
-// click event on the save button, and call the add array function
-// clear the text box
-// list of items to be displayed after click - from the array - RENDER FUNCTION to create UI of the list
-// delete button next to each task in list
-// on click delete, pass ID of the task and remove from array
-// rerender the list after delete

@@ -16,6 +16,9 @@ body{
     width: 800px;
     background-color: #175873;
     border-radius: 30px;
+    border-left:50px solid #175873;
+    border-right:50px solid #175873;
+    border-top:50px solid #175873;
 }
 
 #listOfToDoItems{

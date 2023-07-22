@@ -21,6 +21,14 @@
         type="text"
         id="newToDoItem"
       />
+      <label for="priorityList">set priority:</label>
+      <select id="priorityList" name="priorityList">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low" selected>Low</option>
+      </select>
+      <label for="dueDate">set due date:</label>
+      <input type="datetime-local" id="dueDate"></input>
       <button
         style="font-size: x-small"
         class="btn-lg btn-success btn btn-primary"
@@ -29,14 +37,6 @@
       >
         Press to submit
       </button>
-      <label for="priorityList">set priority:</label>
-      <select id="priorityList" name="priorityList">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low" selected>Low</option>
-      </select>
-      <label for="dueDate">set due date:</label>
-      <input type="date" id="dueDate"></input>
     </div>
     <div id="encase">
       <div>
@@ -50,10 +50,9 @@
         <label for="endDateTime">enter end date:</label>
         <input type="date" id="endDateTime"></input>
         <label for="filterTasksByTags">enter tag(s) to filter by:</label>
-        <select id="filterTasksByTags" name="filterTasksByTags">
-        </select>
+        <input id="filterTasksByTags" name="filterTasksByTags"></input>
         <label for="filterTasksByCategories">enter categories to filter by:</label>
-        <select id="filterTasksByCategories" name="filterTasksByCategories">
+        <input id="filterTasksByCategories" name="filterTasksByCategories"></input>
         </select>
       </div>
       <div id="listOfToDoItems"></div>
