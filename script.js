@@ -10,6 +10,8 @@ var priorityTable = { High: 1, Low: -1, Medium: 0 };
 var currDateTime = formatDateToDatetimeLocal(new Date());
 var filterTags = [];
 var filterCategories = [];
+var resetTags = document.getElementById("resetTags");
+var resetCategories = document.getElementById("resetCategories");
 var pendingOnlyButton = document.getElementById("pendingOnly");
 var displayAllTasks = document.getElementById("displayAllTasks");
 var displayMissedTasks = document.getElementById("displayMissedTasks");
@@ -18,7 +20,43 @@ var sortingAlgoSelection = document.getElementById("sortTasksBy");
 var startDateTime = document.getElementById("startDateTime");
 var endDateTime = document.getElementById("endDateTime");
 var log = JSON.parse(localStorage.getItem("log")) || [];
+var filterTasksByCategoriesInput = document.getElementById(
+    "filterTasksByCategories"
+);
+var filterTasksByTagsInput = document.getElementById("filterTasksByTags");
+var listToRender = [];
 // var clearAll = document.getElementById("clearAll");
+
+resetTags.addEventListener("click", function(){
+    filterTags = [];
+});
+
+resetCategories.addEventListener("click", function(){
+    filterCategories = [];
+});
+
+filterTasksByCategoriesInput.addEventListener("keypress", function (event) {
+    if (event.key == "Enter") {
+        if (filterTasksByCategoriesInput.value == "") {
+            return;
+        } else {
+            var temp = filterTasksByCategoriesInput.value;
+            filterCategories.push(temp);
+            render();
+        }
+    }
+});
+
+filterTasksByTagsInput.addEventListener("keypress", function (event) {
+    if (event.key == "Enter") {
+        if (filterTasksByTagsInput.value == "") {
+            return;
+        } else {
+            filterTags.push(filterTasksByTagsInput.value);
+            render();
+        }
+    }
+});
 
 function showAllTasks() {
     listOfToDoItems.innerHTML = "";
@@ -138,40 +176,6 @@ newItemTextBox.addEventListener(
     false
 );
 
-// sortTasksBySelection.addEventListener("change", function () {
-//     const selectedOption = sortTaksBySelection.value;
-//     if (selectedOption == "Priority") sortingFunction = prioritySortingfunction;
-//     else sortingFunction = dueDateSortingFunction;
-//     render();
-// });
-
-// API call to add a lot of tasks
-// fetch("https://jsonplaceholder.typicode.com/todos")
-//     .then((response) =>
-//     {
-//         if (!response.ok)
-//         {
-//             throw new Error("Network response was not OK");
-//         }
-//         return response.json();
-//     })
-//     .then((data) =>
-//     {
-//         // Process the received data
-//         data.forEach(element => {
-//             var ele = {id:element.id, text:element.title, done:element.completed};
-//             var newItem = createListItem(ele);
-//             count += 1;
-//             listOfToDoItems.appendChild(newItem);
-//             listOfItems.push(newItem);
-//         });
-//     })
-//     .catch((error) =>
-//     {
-//         // Handle any errors that occurred during the fetch request
-//         console.log("Error:", error.message);
-//     });
-
 // Function to retrieve the listOfItems from Local Storage
 function getlistOfItemsFromLocalStorage() {
     var storedList = localStorage.getItem("listOfItems");
@@ -212,10 +216,16 @@ function renderPending() {
     render();
 }
 
+function renderList(listToRender) {
+    listOfToDoItems.innerHTML = "";
+    for (var i = 0; i < listToRender.length; ++i) {
+        listOfToDoItems.appendChild(createListItem(listToRender[i]));
+    }
+}
+
 function render() {
     currDateTime = formatDateToDatetimeLocal(new Date());
-    listOfToDoItems.innerHTML = "";
-    listOfItems.sort(sortingFunction);
+    listToRender = [];
     for (var i = 0; i < listOfItems.length; ++i) {
         if (
             filterToDoItems["missed"] &&
@@ -233,9 +243,37 @@ function render() {
             startDateTime.value <= currDateTime &&
             endDateTime.value >= currDateTime
         )
-            listOfToDoItems.appendChild(createListItem(listOfItems[i]));
+        listToRender.push(listOfItems[i]);  
     }
+    listToRender.sort(sortingFunction);
+    filterByTags();
+    filterByCategories();
+    renderList(listToRender);
     saveListOfItemsToLocalStorage();
+}
+
+function filterByCategories() {
+    if (filterCategories.length == 0) 
+    {
+        return;
+    }
+    var filteredTasks = listOfItems.filter((task) => {
+        return task.categories.some((category) =>
+            filterCategories.includes(category)
+        );
+    });
+    listToRender = filteredTasks;
+}
+
+function filterByTags() {
+    if (filterTags.length == 0)
+    {
+        return;
+    }
+    var filteredTasks = listToRender.filter((task) => {
+        return task.tags.some((tag) => filterTags.includes(tag));
+    });
+    listToRender = filteredTasks;
 }
 
 function deleteItem(id) {
@@ -323,15 +361,9 @@ function addCategoryToItem(val, id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
             listOfItems[i].categories.push(val);
-            return;
         }
     }
     render();
-    const changedTask = listOfItems.find((item) => item.id == id);
-    logActivity(
-        "Category Added",
-        `"${val}" category added to "${changedTask.text}"`
-    );
 }
 
 function addTagToItem(val, id) {
@@ -339,12 +371,9 @@ function addTagToItem(val, id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
             listOfItems[i].tags.push(val);
-            return;
         }
     }
     render();
-    const changedTask = listOfItems.find((item) => item.id == id);
-    logActivity("Tag Added", `"${val}" tag added to "${changedTask.text}"`);
 }
 
 // function to create a new To Do List item
