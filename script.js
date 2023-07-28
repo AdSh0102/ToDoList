@@ -20,12 +20,24 @@ var sortingAlgoSelection = document.getElementById("sortTasksBy");
 var startDateTime = document.getElementById("startDateTime");
 var endDateTime = document.getElementById("endDateTime");
 var log = JSON.parse(localStorage.getItem("log")) || [];
-var filterTasksByCategoriesInput = document.getElementById("filterTasksByCategories");
+var filterTasksByCategoriesInput = document.getElementById(
+    "filterTasksByCategories"
+);
 var searchBox = document.getElementById("searchInput");
 var filterTasksByTagsInput = document.getElementById("filterTasksByTags");
 var listToRender = [];
 var currentTaskId = null; // Track the ID of the current main task being processed
 var subtaskCounter = 1;
+var searchInput = null;
+nlp.plugin(compromiseDates); // load the plugin
+
+function extractDueDate(input) {
+    var doc = nlp(input);
+    // find and interpret each date in the text
+    var dates = doc.dates().get()[0];
+    // return the text
+    return dates ? new Date(dates.end) : null;
+}
 
 // Function to open the modal
 function openModal() {
@@ -51,7 +63,11 @@ addSubtaskButton.addEventListener("click", function () {
             (task) => task.id === currentTaskId
         );
         if (mainTaskIndex !== -1) {
-            listToRender[mainTaskIndex].subtasks.push({text:subtaskText, done:false, id: subtaskCounter});
+            listToRender[mainTaskIndex].subtasks.push({
+                text: subtaskText,
+                done: false,
+                id: subtaskCounter,
+            });
             ++subtaskCounter;
             render();
         }
@@ -98,7 +114,7 @@ filterTasksByTagsInput.addEventListener("keypress", function (event) {
 function showAllTasks() {
     listToRender = [];
     listOfItems.forEach((task) => {
-        listToRender.push((task));
+        listToRender.push(task);
     });
     selectedPriorities = [];
     renderList(listToRender);
@@ -113,17 +129,14 @@ document
 var selectedPriorities = [];
 
 function filterByPriority(priority) {
-    if(priority in selectedPriorities)
-    {
+    if (priority in selectedPriorities) {
         selectedPriorities.filter((element) => element !== priority);
-    }
-    else
-    {
+    } else {
         selectedPriorities.push(priority);
     }
-    var filteredTasks = listOfItems.filter(
-        (task) => selectedPriorities.includes(task.priority)
-      );
+    var filteredTasks = listOfItems.filter((task) =>
+        selectedPriorities.includes(task.priority)
+    );
     listToRender = filteredTasks;
     renderList(filteredTasks);
 }
@@ -286,6 +299,38 @@ function render() {
     saveListOfItemsToLocalStorage();
 }
 
+searchBox.addEventListener("keypress", function (event) {
+    if (key != "Enter") return;
+    searchInput = searchBox.value;
+    search();
+});
+
+function search() {
+    if (searchInput.length == 0) {
+        // If the search input is empty, show all tasks
+        return;
+    }
+
+    // Search for tasks with names similar to the search input
+    var filteredTasks = listOfItems.filter((task) => {
+        if (task.text.toLowerCase().includes(searchInput.toLowerCase()))
+            return true;
+        var okay = 0;
+        task.subtasks.forEach((subtask) => {
+            console.log(
+                subtask.text.toLowerCase(),
+                subtask.text.toLowerCase().includes(searchInput.toLowerCase())
+            );
+            if (subtask.text.toLowerCase().includes(searchInput.toLowerCase()))
+                okay = 1;
+        });
+        if (okay == 1) return true;
+    });
+
+    listToRender = filteredTasks;
+    renderList(filteredTasks);
+}
+
 function filterByCategories() {
     if (filterCategories.length == 0) {
         return;
@@ -309,22 +354,21 @@ function filterByTags() {
 }
 
 function deleteItem(id) {
-    var index = 0;
+    var index = -1;
     for (var i = 0; i < listOfItems.length; i++) {
         if (listOfItems[i].id == id) index = i;
     }
+    if (index == -1) return;
+    logActivity("Delete", listOfItems[index].text);
     listOfItems.splice(index, 1);
     render();
-    var deletedTask = listOfItems.find((item) => item.id == id);
-    logActivity("Delete", deletedTask.text);
 }
 
 function changeStatus(id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
             listOfItems[i].done = !listOfItems[i].done;
-            for(var j=0;j<listOfItems[i].subtasks.length;++j)
-            {
+            for (var j = 0; j < listOfItems[i].subtasks.length; ++j) {
                 listOfItems[i].subtasks[j].done = listOfItems[i].done;
             }
             break;
@@ -428,7 +472,7 @@ function createListItem(item) {
     var addTagBox = document.createElement("input");
     var addSubtaskButton = document.createElement("button");
     var subtasksDiv = document.createElement("div");
-    
+
     subtasksDiv.className = "subtasks";
     addSubtaskButton.textContent = "Add Subtask";
     addSubtaskButton.addEventListener("click", function () {
@@ -498,7 +542,7 @@ function createListItem(item) {
     delButton.style.color = "white";
     delButton.innerHTML = "Delete";
     delButton.addEventListener("click", function () {
-        deleteItem(element.id);
+        deleteItem(item.id);
     });
 
     if (item.done) doneButton.style.backgroundColor = "green";
@@ -575,25 +619,30 @@ function createListItem(item) {
         else subtaskDoneButton.innerHTML = "Pending";
         subtaskDoneButton.addEventListener("click", function () {
             subtask.done = !subtask.done; // Update the done state for the clicked subtask
-        
+
             // Find the main task (item) in the listOfItems array and update the corresponding subtask
-            const mainTaskIndex = listOfItems.findIndex((task) => task.id === item.id);
+            const mainTaskIndex = listOfItems.findIndex(
+                (task) => task.id === item.id
+            );
             if (mainTaskIndex !== -1) {
-                const subtaskIndex = listOfItems[mainTaskIndex].subtasks.findIndex(
-                    (sub) => sub.id === subtask.id
-                );
+                const subtaskIndex = listOfItems[
+                    mainTaskIndex
+                ].subtasks.findIndex((sub) => sub.id === subtask.id);
                 if (subtaskIndex !== -1) {
-                    listOfItems[mainTaskIndex].subtasks[subtaskIndex].done = subtask.done;
+                    listOfItems[mainTaskIndex].subtasks[subtaskIndex].done =
+                        subtask.done;
                 }
             }
-        
+
             if (subtask.done) subtaskDoneButton.style.backgroundColor = "green";
             else subtaskDoneButton.style.backgroundColor = "red";
             if (subtask.done) subtaskDoneButton.innerHTML = "Done";
             else subtaskDoneButton.innerHTML = "Pending";
             render();
-        
-            var action = subtask.done ? "Marked as Done for subtask" : "Marked as Pending for subtask";
+
+            var action = subtask.done
+                ? "Marked as Done for subtask"
+                : "Marked as Pending for subtask";
             logActivity(action, subtask.text);
         });
         var subtaskPara = document.createElement("p");
@@ -605,7 +654,6 @@ function createListItem(item) {
         subtasksDiv.appendChild(subtaskContainer);
     });
 
-
     return element;
 }
 
@@ -613,12 +661,16 @@ function createListItem(item) {
 function newItem(val, priorityVal, dueDateVal) {
     if (regex.test(val)) return;
     if (dueDateVal == "") {
-        var currentDate = new Date();
-        // ... Calculate the due date ...
-        var dueDateObject = new Date(currentDate);
-        dueDateObject.setDate(dueDateObject.getDate() + 7);
-        var formattedDueDate = formatDateToDatetimeLocal(dueDateObject);
-        dueDateVal = formattedDueDate;
+        dueDateVal = extractDueDate(val);
+        if (dueDateVal != null)
+            dueDateVal = formatDateToDatetimeLocal(dueDateVal);
+        if (dueDateVal == null) {
+            var currentDate = new Date();
+            var dueDateObject = new Date(currentDate);
+            dueDateObject.setDate(dueDateObject.getDate() + 7);
+            var formattedDueDate = formatDateToDatetimeLocal(dueDateObject);
+            dueDateVal = formattedDueDate;
+        }
     }
     var newItem = {
         id: count,
@@ -631,7 +683,6 @@ function newItem(val, priorityVal, dueDateVal) {
         editing: false,
         subtasks: [],
     };
-    // newItem.subtasks = subtaskss.map((subtask) => ({ text: subtask, done: false }));
     count += 1;
     listOfItems.push(newItem);
     render();

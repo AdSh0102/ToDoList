@@ -117,3 +117,12 @@ textarea {
     float: right;
     cursor: pointer;
 }
+
+#part{
+    border: solid 2px aquamarine;
+}
+
+#amenities{
+    display: flex;
+    flex-direction: row;
+}

@@ -13,42 +13,55 @@
         <title>To Do List</title>
     </head>
     <body>
-        <h1>To Do List</h1>
-        <div style="margin: 20px">
-            <input
-                placeholder="Enter a task"
-                class="form-control-lg"
-                type="text"
-                id="newToDoItem"
-            />
-            <label for="priorityList">set priority:</label>
-            <select id="priorityList" name="priorityList">
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low" selected>Low</option>
-            </select>
-            <label for="dueDate">set due date:</label>
-            <input type="datetime-local" id="dueDate" />
-            <button
-                style="font-size: x-small"
-                class="btn-lg btn-success btn btn-primary"
-                type="submit"
-                id="submitButton"
-            >
-                Press to submit
-            </button>
+        <div id="amenities">
+            <!-- <div class="amenity">
+                <h1>Reminders</h1>
+                <input type="text" id="taskInput" placeholder="Enter task" />
+                <input type="datetime-local" id="reminderTime" />
+                <button onclick="setReminder()">Set Reminder</button>
+            </div> -->
+            <div class="amenity">
+                <h1>To Do List</h1>
+                <div style="margin: 20px">
+                    <input
+                        placeholder="Enter a task"
+                        class="form-control-lg"
+                        type="text"
+                        id="newToDoItem"
+                    />
+                    <label for="priorityList">set priority:</label>
+                    <select id="priorityList" name="priorityList">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low" selected>Low</option>
+                    </select>
+                    <label for="dueDate">set due date:</label>
+                    <input type="datetime-local" id="dueDate" />
+                    <button
+                        style="font-size: x-small"
+                        class="btn-lg btn-success btn btn-primary"
+                        type="submit"
+                        id="submitButton"
+                    >
+                        Press to submit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="encase">
             <div>
                 <button id="filterHighPriority">High Priority</button>
                 <button id="filterMediumPriority">Medium Priority</button>
                 <button id="filterLowPriority">Low Priority</button>
                 <button id="showAllTasksButton">Show All Tasks</button>
             </div>
-
-            <!-- <button id="clearAll">erase everything</button> -->
-        </div>
-        <div id="encase">
             <div>
-                <input type="text" id="searchInput" placeholder="Search by task name or description">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by task name or description"
+                />
 
                 <select id="sortTasksBy" name="sortTasksBy">
                     <option value="">Sort tasks according to</option>
@@ -66,13 +79,8 @@
                     id="filterTasksByCategories"
                     name="filterTasksByCategories"
                 />
-                <label for="filterTasksByTags"
-                    >enter tags to filter by:</label
-                >
-                <input
-                    id="filterTasksByTags"
-                    name="filterTasksByTags"
-                />
+                <label for="filterTasksByTags">enter tags to filter by:</label>
+                <input id="filterTasksByTags" name="filterTasksByTags" />
                 <button id="resetCategories">Reset Categories</button>
                 <button id="resetTags">Reset Tags</button>
                 <button id="pendingOnly">Show pending only</button>
@@ -84,10 +92,21 @@
         <div id="modal" class="modal">
             <div class="modal-content">
                 <span class="close" id="closeModal">&times;</span>
-                <input type="text" id="subtaskInput" placeholder="Enter a subtask" />
+                <input
+                    type="text"
+                    id="subtaskInput"
+                    placeholder="Enter a subtask"
+                />
                 <button id="addSubtaskButton">Add Subtask</button>
             </div>
         </div>
+        <script src="https://unpkg.com/compromise"></script>
+        <script src="https://unpkg.com/compromise-dates"></script>
+        <!-- <script defer>
+            nlp.plugin(compromiseDates); // load the plugin
+            let date = nlp("lets meet in 32 days").dates().get()[0];
+            document.body.innerHTML = new Date(date.start).toDateString();
+        </script> -->
         <script src="script.js"></script>
     </body>
 </html>
