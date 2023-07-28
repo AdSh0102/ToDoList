@@ -48,6 +48,8 @@
         </div>
         <div id="encase">
             <div>
+                <input type="text" id="searchInput" placeholder="Search by task name or description">
+
                 <select id="sortTasksBy" name="sortTasksBy">
                     <option value="">Sort tasks according to</option>
                     <option value="Priority">Priority</option>
@@ -78,6 +80,13 @@
                 <button id="displayMissedTasks">Show missed tasks</button>
             </div>
             <div id="listOfToDoItems"></div>
+        </div>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModal">&times;</span>
+                <input type="text" id="subtaskInput" placeholder="Enter a subtask" />
+                <button id="addSubtaskButton">Add Subtask</button>
+            </div>
         </div>
         <script src="script.js"></script>
     </body>

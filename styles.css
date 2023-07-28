@@ -4,6 +4,7 @@ body {
     align-items: center;
     flex-direction: column;
     background-color: #262aa8;
+    height: fit-content;
 }
 
 #encase {
@@ -29,6 +30,7 @@ body {
 .listItem {
     min-height: 100px;
     padding: 0;
+    height: fit-content;
     margin: 20px;
     width: 600px !important;
     overflow-wrap: break-word;
@@ -89,4 +91,29 @@ textarea::-webkit-scrollbar-thumb {
 
 textarea {
     box-shadow: 0px;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 20% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    max-width: 400px;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
 }
