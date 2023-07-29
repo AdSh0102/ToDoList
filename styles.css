@@ -160,3 +160,128 @@ textarea {
 }
 
 /* Add any additional styling for the reminder content */
+
+/* CSS for Priority Buttons */
+button#filterHighPriority,
+button#filterMediumPriority,
+button#filterLowPriority {
+    background-color: #007bff; /* Blue color for high priority */
+    color: #fff; /* White text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Add padding */
+    margin-right: 5px; /* Add some spacing between buttons */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* Specific CSS for High Priority Button */
+button#filterHighPriority {
+    background-color: #f44336; /* Red color for high priority */
+}
+
+/* Specific CSS for Medium Priority Button */
+button#filterMediumPriority {
+    background-color: #ffc107; /* Yellow color for medium priority */
+}
+
+/* Specific CSS for Low Priority Button */
+button#filterLowPriority {
+    background-color: #28a745; /* Green color for low priority */
+}
+
+/* CSS for Show All Tasks Button */
+button#showAllTasksButton {
+    background-color: #6c757d; /* Gray color for show all tasks button */
+    color: #fff; /* White text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Add padding */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* CSS for Create Reminder Button */
+button#createReminderButton {
+    background-color: #007bff; /* Blue color for the button */
+    color: #fff; /* White text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Add padding */
+    margin-top: 20px; /* Add margin from the content above */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* Hover effect */
+button#createReminderButton:hover {
+    background-color: #0056b3; /* Darker blue color on hover */
+}
+
+/* Active/focus effect */
+button#createReminderButton:focus {
+    outline: none; /* Remove the default outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a subtle box shadow on focus */
+}
+
+/* If you want to style the button when it's pressed */
+button#createReminderButton:active {
+    background-color: grey; /* Darker blue color on hover */
+    /* Add your styles here */
+}
+
+/* CSS for Create to do Button */
+button#createToDo {
+    background-color: #007bff; /* Blue color for the button */
+    color: #fff; /* White text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Add padding */
+    margin-top: 20px; /* Add margin from the content above */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* Hover effect */
+button#createToDo:hover {
+    background-color: #0056b3; /* Darker blue color on hover */
+}
+
+/* Active/focus effect */
+button#createToDo:focus {
+    outline: none; /* Remove the default outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a subtle box shadow on focus */
+}
+
+/* If you want to style the button when it's pressed */
+button#createToDo:active {
+    background-color: grey; /* Darker blue color on hover */
+    /* Add your styles here */
+}
+
+#toDoOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: 1;
+}
+
+#toDoContent {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 2;
+    width: 400px;
+    max-width: 90%;
+}
+
+#palettes{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-bottom: 50px;
+}

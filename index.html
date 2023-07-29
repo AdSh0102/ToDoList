@@ -13,47 +13,53 @@
         <title>To Do List</title>
     </head>
     <body>
-        <div id="reminderPalette" style="display: none">
-            <div id="reminderOverlay"></div>
-            <div id="reminderContent">
-                <label for="reminderText">Reminder Text:</label>
-                <input type="text" id="reminderText" />
-                <label for="reminderDate">Reminder Date:</label>
-                <input type="datetime-local" id="reminderDate" />
-                <button id="saveReminderButton">Save Reminder</button>
-                <button id="cancelReminderButton">Cancel</button>
-            </div>
-        </div>
-        <div id="amenities">
-            <button id="createReminderButton">Create Reminder</button>
-            <div class="amenity">
-                <h1>To Do List</h1>
-                <div style="margin: 20px">
-                    <input
-                        placeholder="Enter a task"
-                        class="form-control-lg"
-                        type="text"
-                        id="newToDoItem"
-                    />
-                    <label for="priorityList">set priority:</label>
-                    <select id="priorityList" name="priorityList">
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low" selected>Low</option>
-                    </select>
-                    <label for="dueDate">set due date:</label>
-                    <input type="datetime-local" id="dueDate" />
-                    <button
-                        style="font-size: x-small"
-                        class="btn-lg btn-success btn btn-primary"
-                        type="submit"
-                        id="submitButton"
-                    >
-                        Press to submit
-                    </button>
+        <div id="palettes">
+            <div id="reminderPalette" style="display: none">
+                <div id="reminderOverlay"></div>
+                <div id="reminderContent">
+                    <label for="reminderText">Reminder Text:</label>
+                    <input type="text" id="reminderText" />
+                    <label for="reminderDate">Reminder Date:</label>
+                    <input type="datetime-local" id="reminderDate" />
+                    <button id="saveReminderButton">Save Reminder</button>
+                    <button id="cancelReminderButton">Cancel</button>
                 </div>
             </div>
+            <div id="toDoPalette" style="display: none">
+                <div id="toDoOverlay"></div>
+                <div id="toDoContent">
+                    <h1>To Do List</h1>
+                    <div style="margin: 20px">
+                        <input
+                            placeholder="Enter a task"
+                            class="form-control-lg"
+                            type="text"
+                            id="newToDoItem"
+                        />
+                        <label for="priorityList">set priority:</label>
+                        <select id="priorityList" name="priorityList">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low" selected>Low</option>
+                        </select>
+                        <label for="dueDate">set due date:</label>
+                        <input type="datetime-local" id="dueDate" />
+                        <button
+                            style="font-size: x-small"
+                            class="btn-lg btn-success btn btn-primary"
+                            type="submit"
+                            id="submitButton"
+                        >
+                            Press to submit
+                        </button>
+                        <button id="cancelToDoButton">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <button id="createToDo">Create a new to do task</button>
+            <button id="createReminderButton">Create Reminder</button>
         </div>
+        
 
         <div id="encase">
             <div>

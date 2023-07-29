@@ -201,7 +201,9 @@ function showAllTasks() {
         listToRender.push(task);
     });
     selectedPriorities = [];
-    renderList(listToRender);
+    filterTags = [];
+    filterCategories = [];
+    render();
 }
 
 document
@@ -634,7 +636,7 @@ function createListItem(item) {
         changeStatus(item.id);
     });
 
-    para.style.backgroundColor = "#87ACA3";
+    para.style.backgroundColor = "white";
     para.style.border = "0px";
     para.style.display = "initial";
     para.style.width = "400px";
@@ -681,11 +683,11 @@ function createListItem(item) {
     });
 
     if (priorityList.value == "Low") {
-        element.style.backgroundColor = "lightblue";
+        element.style.backgroundColor = "#28a745";
     } else if (priorityList.value == "High") {
-        element.style.backgroundColor = "red";
+        element.style.backgroundColor = "#f44336";
     } else {
-        element.style.backgroundColor = "#87ACA3";
+        element.style.backgroundColor = "#28a745";
     }
 
     item.subtasks.forEach((subtask) => {
@@ -842,6 +844,37 @@ function initialize() {
     // Call the checkReminders function every minute (adjust the interval as needed)
     setInterval(checkReminders, 30000); // 60000 milliseconds = 1 minute
 }
+
+// Function to handle to-do task creation
+function createToDoTask() {
+    // Show the palette/modal to capture to-do task details
+    openToDoPalette();
+}
+
+// Function to open the to-do task palette/modal
+function openToDoPalette() {
+    var toDoPalette = document.getElementById("toDoPalette");
+    toDoPalette.style.display = "block";
+}
+
+// Function to cancel the to-do task creation
+function cancelToDoTask() {
+    closeToDoPalette();
+}
+
+// Function to close the to-do task palette/modal
+function closeToDoPalette() {
+    var toDoPalette = document.getElementById("toDoPalette");
+    toDoPalette.style.display = "none";
+}
+
+// Add event listeners for the "Press to submit" and "Cancel" buttons in the to-do palette
+document.getElementById("cancelToDoButton").addEventListener("click", cancelToDoTask);
+
+// Add event listener to the "Create a new to do task" button
+document.getElementById("createToDo").addEventListener("click", function () {
+    createToDoTask();
+});
 
 // Call the initialize function to start the application
 initialize();
