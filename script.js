@@ -56,7 +56,7 @@ function openReminderPalette() {
 function saveReminder() {
     var reminderText = document.getElementById("reminderText").value;
     var reminderDate = document.getElementById("reminderDate").value;
-    
+
     // Perform any necessary validation on the reminderText and reminderDate
     if (reminderDate == "") {
         reminderDate = extractDueDate(reminderDate);
@@ -606,6 +606,12 @@ function createListItem(item) {
     element.appendChild(dueDateDiv);
     element.appendChild(addCategoryBox);
     element.appendChild(addTagBox);
+    if(item.subtasks.length > 0)
+    {
+        var subtaskHeading = document.createElement('h3');
+        subtaskHeading.innerHTML = "Subtasks";
+        element.append(subtaskHeading);
+    }
     element.appendChild(subtasksDiv);
     element.appendChild(addSubtaskButton);
 
@@ -637,7 +643,6 @@ function createListItem(item) {
     });
 
     para.style.backgroundColor = "white";
-    para.style.border = "0px";
     para.style.display = "initial";
     para.style.width = "400px";
     para.style.height = "fit-content";
@@ -701,6 +706,7 @@ function createListItem(item) {
         subtaskEditButton.innerHTML = "Edit";
         subtaskEditButton.addEventListener("click", function () {
             subtask.editing = !subtask.editing;
+            subtaskPara.readOnly = !subtaskPara.readOnly; 
             render();
             saveListOfItemsToLocalStorage(); // Save changes to local storage
         });
@@ -711,9 +717,13 @@ function createListItem(item) {
         subtaskDeleteButton.style.backgroundColor = "black";
         subtaskDeleteButton.innerHTML = "Delete";
         subtaskDeleteButton.addEventListener("click", function () {
-            var mainTaskIndex = listOfItems.findIndex((task) => task.id === item.id);
+            var mainTaskIndex = listOfItems.findIndex(
+                (task) => task.id === item.id
+            );
             if (mainTaskIndex !== -1) {
-                var subtaskIndex = listOfItems[mainTaskIndex].subtasks.findIndex((sub) => sub.id === subtask.id);
+                var subtaskIndex = listOfItems[
+                    mainTaskIndex
+                ].subtasks.findIndex((sub) => sub.id === subtask.id);
                 if (subtaskIndex !== -1) {
                     listOfItems[mainTaskIndex].subtasks.splice(subtaskIndex, 1);
                     render();
@@ -734,25 +744,31 @@ function createListItem(item) {
             saveListOfItemsToLocalStorage(); // Save changes to local storage
         });
 
-        var subtaskPara = document.createElement("p");
+        var subtaskPara = document.createElement("textarea");
         if (subtask.editing) {
             subtaskEditButton.style.backgroundColor = "grey";
             subtaskEditButton.innerHTML = "Save";
-            subtaskPara.contentEditable = true;
+            subtaskPara.readOnly = false; 
             subtaskPara.addEventListener("input", function () {
-                subtask.text = subtaskPara.textContent.trim();
+                subtask.text = subtaskPara.textContent;
                 saveListOfItemsToLocalStorage(); // Save changes to local storage
             });
-        }
-        else
-        {
+        } else {
+            subtaskPara.readOnly = true; 
             subtaskEditButton.style.backgroundColor = "blue";
             subtaskEditButton.innerHTML = "Edit";
         }
+        subtaskPara.style.backgroundColor = "white";
+        subtaskPara.style.display = "initial";
+        subtaskPara.style.height = "fit-content";
+        subtaskPara.style.width = "100px";
+        subtaskPara.style.borderRadius = "5px";
+        subtaskPara.style.border = "5px solid transparent";
+        subtaskPara.style.resize = "none";
         subtaskPara.textContent = subtask.text;
-        subtaskPara.style.display = "inline";
+        subtaskPara.style.minWidth = "100px";
 
-        var subtaskButtons = document.createElement('div');
+        var subtaskButtons = document.createElement("div");
         subtaskContainer.appendChild(subtaskPara);
         subtaskButtons.appendChild(subtaskDeleteButton); // Add the delete button
         subtaskButtons.appendChild(subtaskDoneButton);
@@ -815,7 +831,10 @@ function checkReminders() {
         var reminderTime = reminderDate.getTime();
 
         // If the reminder date has passed and it has not triggered an alert yet
-        if (reminderTime <= currentTime && !triggeredReminderIds.includes(reminder.id)) {
+        if (
+            reminderTime <= currentTime &&
+            !triggeredReminderIds.includes(reminder.id)
+        ) {
             // Show the alert for the reminder
             alert("Reminder: " + reminder.text);
 
@@ -869,7 +888,9 @@ function closeToDoPalette() {
 }
 
 // Add event listeners for the "Press to submit" and "Cancel" buttons in the to-do palette
-document.getElementById("cancelToDoButton").addEventListener("click", cancelToDoTask);
+document
+    .getElementById("cancelToDoButton")
+    .addEventListener("click", cancelToDoTask);
 
 // Add event listener to the "Create a new to do task" button
 document.getElementById("createToDo").addEventListener("click", function () {

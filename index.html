@@ -59,7 +59,6 @@
             <button id="createToDo">Create a new to do task</button>
             <button id="createReminderButton">Create Reminder</button>
         </div>
-        
 
         <div id="encase">
             <div>
@@ -67,32 +66,40 @@
                 <button id="filterMediumPriority">Medium Priority</button>
                 <button id="filterLowPriority">Low Priority</button>
                 <button id="showAllTasksButton">Show All Tasks</button>
-            </div>
-            <div>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Search by task name or description"
-                />
-
                 <select id="sortTasksBy" name="sortTasksBy">
                     <option value="">Sort tasks according to</option>
                     <option value="Priority">Priority</option>
                     <option value="Due Date">Due Date</option>
                 </select>
-                <label for="startDateTime">enter start date:</label>
-                <input type="datetime-local" id="startDateTime" />
-                <label for="endDateTime">enter end date:</label>
-                <input type="datetime-local" id="endDateTime" />
-                <label for="filterTasksByCategories"
-                    >enter categories to filter by:</label
-                >
+            </div>
+            <div style="display: flex; flex-direction: row;">
+                <div>
+                    <label for="startDateTime">Enter start date:</label>
+                    <input type="datetime-local" id="startDateTime" />
+                </div>
+                <div>
+                    <label for="endDateTime">Enter end date:</label>
+                    <input type="datetime-local" id="endDateTime" />
+                </div>
+            </div>
+            <div>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search"
+                />
                 <input
                     id="filterTasksByCategories"
                     name="filterTasksByCategories"
+                    placeholder="Filter by Categories"
                 />
-                <label for="filterTasksByTags">enter tags to filter by:</label>
-                <input id="filterTasksByTags" name="filterTasksByTags" />
+                <input
+                    id="filterTasksByTags"
+                    name="filterTasksByTags"
+                    placeholder="Filter by Tags"
+                />
+            </div>
+            <div id="buttonDiv">
                 <button id="resetCategories">Reset Categories</button>
                 <button id="resetTags">Reset Tags</button>
                 <button id="pendingOnly">Show pending only</button>

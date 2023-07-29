@@ -14,13 +14,28 @@ body {
     justify-content: center;
     height: fit-content;
     min-height: 100px;
-    width: 800px;
-    background-color: #175873;
+    width: 1000px;
+    background-color: #cfe9ff;
     border-radius: 30px;
-    border-left: 50px solid #175873;
-    border-right: 50px solid #175873;
-    border-top: 50px solid #175873;
+    border-left: 50px solid #cfe9ff;
+    border-right: 50px solid #cfe9ff;
+    border-top: 50px solid #cfe9ff;
 }
+
+#encase div{
+    margin: 5px;
+}
+
+/* Styling for the labels */
+label {
+    /* Set the font size and line height */
+    font-size: 16px;
+    line-height: 1.5;
+  
+    /* Add some margin to create space between the labels and the associated inputs */
+    margin-bottom: 8px;
+    display: block;
+  }
 
 #listOfToDoItems {
     display: flex;
@@ -278,10 +293,140 @@ button#createToDo:active {
     max-width: 90%;
 }
 
-#palettes{
+#palettes {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     width: 100%;
     margin-bottom: 50px;
+}
+
+/* Styling for input boxes of type datetime-local */
+input {
+    /* Set the font size and line height */
+    font-size: 16px;
+    line-height: 1.5;
+
+    /* Add some padding to create some space between the text and the border */
+    padding: 8px 12px;
+
+    /* Set the border to a solid color and rounded corners */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    /* Add a box-shadow to give it a subtle 3D effect */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /* Add a transition effect for smoother interactions */
+    transition: border-color 0.2s ease-in-out;
+}
+
+/* Apply additional styles when the input is focused */
+input:focus {
+    /* Change the border color to a more noticeable color */
+    border-color: #007bff; /* Replace with your preferred focus color */
+    outline: none; /* Remove the default focus outline */
+}
+
+/* Apply styles when the input is disabled */
+input:disabled {
+    background-color: #f8f9fa; /* Replace with your preferred disabled background color */
+    cursor: not-allowed;
+}
+
+/* Style the select element */
+select {
+    /* Set the font size and line height */
+    font-size: 16px;
+    line-height: 1.5;
+
+    /* Add some padding to create some space between the text and the border */
+    padding: 8px 12px;
+
+    /* Set the border to a solid color and rounded corners */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    /* Add a box-shadow to give it a subtle 3D effect */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /* Set the appearance to none to remove default styles in some browsers */
+    appearance: none;
+
+    /* Add a transition effect for smoother interactions */
+    transition: border-color 0.2s ease-in-out;
+}
+
+/* Apply additional styles when the select element is focused */
+select:focus {
+    /* Change the border color to a more noticeable color */
+    border-color: #007bff; /* Replace with your preferred focus color */
+    outline: none; /* Remove the default focus outline */
+}
+
+/* Apply styles when the select element is disabled */
+select:disabled {
+    background-color: #f8f9fa; /* Replace with your preferred disabled background color */
+    cursor: not-allowed;
+}
+
+/* Styling for the buttons inside the buttonDiv */
+#buttonDiv {
+    display: flex;
+    justify-content: center; /* Center the buttons horizontally */
+    margin-bottom: 20px; /* Add some spacing at the bottom */
+}
+
+/* Style the buttons */
+#buttonDiv button {
+    /* Set the font size and line height */
+    font-size: 16px;
+    line-height: 1.5;
+
+    /* Add some padding to create some space between the text and the button border */
+    padding: 10px 20px;
+
+    /* Set the background color */
+    background-color: #007bff; /* Replace with your preferred button background color */
+    color: #fff; /* Set the text color to white for better contrast */
+
+    /* Set the border to none to remove the default button border */
+    border: none;
+
+    /* Add a box-shadow to give it a subtle 3D effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    /* Add a transition effect for smoother interactions */
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Apply additional styles when the button is hovered */
+#buttonDiv button:hover {
+    /* Darken the background color on hover */
+    background-color: #0056b3; /* Replace with a slightly darker shade of the button color */
+    cursor: pointer;
+}
+
+/* Apply additional styles when the button is focused */
+#buttonDiv button:focus {
+    outline: none; /* Remove the default focus outline */
+    /* You can add additional styles here if needed */
+}
+
+/* Apply additional styles when the button is active (clicked) */
+#buttonDiv button:active {
+    /* Darken the background color when the button is clicked */
+    background-color: #003974; /* Replace with a darker shade of the button color */
+}
+
+/* Style the buttons when they are in a disabled state */
+#buttonDiv button:disabled {
+    background-color: #ccc; /* Replace with your preferred disabled background color */
+    color: #999; /* Replace with your preferred disabled text color */
+    cursor: not-allowed;
+}
+
+/* Adjust the margin between the buttons */
+#buttonDiv button:not(:last-child) {
+    margin-right: 10px;
 }
