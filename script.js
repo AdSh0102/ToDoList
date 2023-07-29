@@ -493,7 +493,6 @@ function changeSortingAlgo() {
 function changePriority(value, id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
-            console.log(id);
             listOfItems[i].priority = value;
         }
     }
@@ -540,6 +539,7 @@ function createListItem(item) {
     var addTagBox = document.createElement("input");
     var addSubtaskButton = document.createElement("button");
     var subtasksDiv = document.createElement("div");
+    var draggedSubtask = null;
 
     subtasksDiv.className = "subtasks";
 
@@ -687,11 +687,19 @@ function createListItem(item) {
     item.subtasks.forEach((subtask) => {
         var subtaskContainer = document.createElement("div");
         subtaskContainer.className = "subtask-container";
+        subtaskContainer.dataset.mainTaskId = item.id;
+        subtaskContainer.setAttribute("draggable", "true");
+        subtaskContainer.dataset.subtaskId = subtask.id;
         subtaskContainer.style.width = "300px";
         var subtaskEditButton = document.createElement("button");
         subtaskEditButton.style.color = "white";
         subtaskEditButton.style.backgroundColor = "blue";
         subtaskEditButton.innerHTML = "Edit";
+        subtaskContainer.addEventListener("dragstart", handleSubtaskDragStart);
+        subtaskContainer.addEventListener("dragenter", handleSubtaskDragEnter);
+        subtaskContainer.addEventListener("dragleave", handleSubtaskDragLeave);
+        subtaskContainer.addEventListener("dragover", handleSubtaskDragOver);
+        subtaskContainer.addEventListener("drop", handleSubtaskDrop);
         subtaskEditButton.addEventListener("click", function () {
             subtask.editing = !subtask.editing;
             subtaskPara.readOnly = !subtaskPara.readOnly;
@@ -791,6 +799,8 @@ function createListItem(item) {
         subtaskContainer.appendChild(subtaskButtons);
         subtasksDiv.appendChild(subtaskContainer);
     });
+
+    element.draggable = true;
 
     return element;
 }
@@ -894,3 +904,102 @@ document.getElementById("createToDo").addEventListener("click", function () {
 });
 
 initialize();
+
+document.addEventListener("DOMContentLoaded", function () {
+    let draggedTask = null;
+    let dropTarget = null;
+
+    document.addEventListener("dragstart", function (event) {
+        event.dataTransfer.setData("text/plain", event.target.id);
+        draggedTask = event.target;
+    });
+
+    listOfToDoItems.addEventListener("dragenter", function (event) {
+        event.preventDefault();
+        dropTarget = event.target;
+    });
+
+    listOfToDoItems.addEventListener("dragover", function (event) {
+        event.preventDefault();
+        var rect = listOfToDoItems.getBoundingClientRect();
+        var offset = event.clientY - rect.top;
+        var height = rect.bottom - rect.top;
+        var scrollThreshold = 50;
+        var scrollSpeed = 10;
+
+        if (offset < scrollThreshold) {
+            listOfToDoItems.scrollTop -= scrollSpeed;
+        } else if (offset > height - scrollThreshold) {
+            listOfToDoItems.scrollTop += scrollSpeed;
+        }
+    });
+
+    listOfToDoItems.addEventListener("drop", function (event) {
+        event.preventDefault();
+        var taskId = event.dataTransfer.getData("text/plain");
+        var taskDiv = document.getElementById(taskId);
+        var dropTargetIndex = Array.from(listOfToDoItems.children).indexOf(
+            dropTarget
+        );
+
+        var draggedTaskIndex = Array.from(listOfToDoItems.children).indexOf(
+            draggedTask
+        );
+        if (draggedTaskIndex < dropTargetIndex) {
+            listOfToDoItems.insertBefore(taskDiv - 1, dropTarget.nextSibling);
+        } else {
+            listOfToDoItems.insertBefore(taskDiv, dropTarget);
+        }
+        dropTarget = null;
+        draggedTask = null;
+    });
+});
+
+function handleSubtaskDragStart(event) {
+    draggedSubtask = event.target;
+    event.dataTransfer.setData("text/plain", event.target.id);
+    var mainTaskId = event.target.dataset.mainTaskId;
+    event.dataTransfer.setData("text/plain", mainTaskId);
+}
+
+function handleSubtaskDragEnter(event) {
+    event.preventDefault();
+    event.target.style.backgroundColor = "lightgray";
+}
+
+function handleSubtaskDragLeave(event) {
+    event.target.style.backgroundColor = "";
+}
+
+function handleSubtaskDragOver(event) {
+    event.preventDefault();
+}
+
+function handleSubtaskDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.target.style.backgroundColor = "";
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.target.style.backgroundColor = "";
+    var mainTaskId = draggedSubtask.getAttribute("data-main-task-id") - 1;
+    var subtaskId = draggedSubtask.id;
+    for(var i=0;i<listOfItems[mainTaskId-1].subtasks.length;++i)
+    {
+        if(subtaskId == listOfItems[mainTaskId-1].subtasks[i].id)
+        {
+            subtaskId = i;
+            break;
+        }
+    }
+    if (mainTaskId !== -1 && subtaskId !== -1) {
+        var [subtask] = listOfItems[mainTaskId].subtasks.splice(subtaskId, 1);
+        var newIndex = Array.from(event.target.parentElement.children).indexOf(
+            event.target
+        );
+        listOfItems[mainTaskId].subtasks.splice(newIndex, 0, subtask);
+        render();
+        saveListOfItemsToLocalStorage();
+    }
+}
