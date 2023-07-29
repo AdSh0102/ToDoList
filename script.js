@@ -362,31 +362,33 @@ function renderList(listToRender) {
 function render() {
     currDateTime = formatDateToDatetimeLocal(new Date());
     listToRender = [];
-    console.log(startDateTime.value, endDateTime.value);
     for (var i = 0; i < listOfItems.length; ++i) {
-        if (filterToDoItems["missed"] && (listOfItems[i].done || listOfItems[i].dueDate > currDateTime))
-        {
+        if (
+            filterToDoItems["missed"] &&
+            (listOfItems[i].done || listOfItems[i].dueDate > currDateTime)
+        ) {
             continue;
         }
-        if (filterToDoItems["pending"] && listOfItems[i].done) 
-        {
+        if (filterToDoItems["pending"] && listOfItems[i].done) {
             continue;
         }
         currDateTime = listOfItems[i].dueDate;
-        if (startDateTime.value === "" && endDateTime.value === "")
-        {
+        if (startDateTime.value === "" && endDateTime.value === "") {
             listToRender.push(listOfItems[i]);
-        }
-        else if (startDateTime.value == "" && endDateTime.value >= currDateTime)
-        {
+        } else if (
+            startDateTime.value == "" &&
+            endDateTime.value >= currDateTime
+        ) {
             listToRender.push(listOfItems[i]);
-        }
-        else if (endDateTime.value == "" && startDateTime.value <= currDateTime)
-        {
+        } else if (
+            endDateTime.value == "" &&
+            startDateTime.value <= currDateTime
+        ) {
             listToRender.push(listOfItems[i]);
-        }
-        else if (startDateTime.value <= currDateTime && endDateTime.value >= currDateTime)
-        {
+        } else if (
+            startDateTime.value <= currDateTime &&
+            endDateTime.value >= currDateTime
+        ) {
             listToRender.push(listOfItems[i]);
         }
     }
@@ -618,9 +620,8 @@ function createListItem(item) {
     element.appendChild(dueDateDiv);
     element.appendChild(addCategoryBox);
     element.appendChild(addTagBox);
-    if(item.subtasks.length > 0)
-    {
-        var subtaskHeading = document.createElement('h3');
+    if (item.subtasks.length > 0) {
+        var subtaskHeading = document.createElement("h3");
         subtaskHeading.innerHTML = "Subtasks";
         subtaskHeading.style.margin = "10px";
         element.append(subtaskHeading);
@@ -722,10 +723,13 @@ function createListItem(item) {
             subtask.editing = !subtask.editing;
             subtaskPara.readOnly = !subtaskPara.readOnly;
             var val = subtaskPara.value;
-            if(!subtask.editing)
-            {
-                var index = listOfItems.findIndex((task) => task.id === item.id);
-                var index2 = listOfItems[index].subtasks.findIndex((curr) => subtask.id === curr.id);
+            if (!subtask.editing) {
+                var index = listOfItems.findIndex(
+                    (task) => task.id === item.id
+                );
+                var index2 = listOfItems[index].subtasks.findIndex(
+                    (curr) => subtask.id === curr.id
+                );
                 listOfItems[index].subtasks[index2].text = val;
             }
             render();
@@ -769,13 +773,13 @@ function createListItem(item) {
         if (subtask.editing) {
             subtaskEditButton.style.backgroundColor = "grey";
             subtaskEditButton.innerHTML = "Save";
-            subtaskPara.readOnly = false; 
+            subtaskPara.readOnly = false;
             subtaskPara.addEventListener("input", function () {
                 subtask.text = subtaskPara.textContent;
                 saveListOfItemsToLocalStorage(); // Save changes to local storage
             });
         } else {
-            subtaskPara.readOnly = true; 
+            subtaskPara.readOnly = true;
             subtaskEditButton.style.backgroundColor = "blue";
             subtaskEditButton.innerHTML = "Edit";
         }

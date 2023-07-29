@@ -22,7 +22,7 @@ body {
     border-top: 50px solid #cfe9ff;
 }
 
-#encase div{
+#encase div {
     margin: 5px;
 }
 
@@ -31,11 +31,11 @@ label {
     /* Set the font size and line height */
     font-size: 16px;
     line-height: 1.5;
-  
+
     /* Add some margin to create space between the labels and the associated inputs */
     margin-bottom: 8px;
     display: block;
-  }
+}
 
 #listOfToDoItems {
     display: flex;
@@ -430,3 +430,60 @@ select:disabled {
 #buttonDiv button:not(:last-child) {
     margin-right: 10px;
 }
+
+/* Styling for Save Reminder button */
+#saveReminderButton {
+    background-color: #4caf50; /* Green background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    padding: 10px 20px; /* Add some padding */
+    margin-right: 10px; /* Add some space between buttons */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+#saveReminderButton:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Styling for Cancel button */
+#cancelReminderButton {
+    background-color: #f44336; /* Red background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    padding: 10px 20px; /* Add some padding */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+#cancelReminderButton:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+/* Styling for Cancel To-Do button */
+#cancelToDoButton {
+    background-color: #f44336; /* Red background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    padding: 10px 20px; /* Add some padding */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+  }
+  
+  #cancelToDoButton:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+  }
+  
+  /* Styling for Submit button */
+  #submitButton {
+    background-color: #007bff; /* Blue background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    padding: 10px 20px; /* Add some padding */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+  }
+  
+  #submitButton:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
