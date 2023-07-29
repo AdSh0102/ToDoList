@@ -691,6 +691,35 @@ function createListItem(item) {
     item.subtasks.forEach((subtask) => {
         var subtaskContainer = document.createElement("div");
         subtaskContainer.className = "subtask-container";
+
+        // Add edit functionality for subtasks
+        var subtaskEditButton = document.createElement("button");
+        subtaskEditButton.style.color = "white";
+        subtaskEditButton.style.backgroundColor = "blue";
+        subtaskEditButton.innerHTML = "Edit";
+        subtaskEditButton.addEventListener("click", function () {
+            subtask.editing = !subtask.editing;
+            render();
+            saveListOfItemsToLocalStorage(); // Save changes to local storage
+        });
+
+        // Add delete functionality for subtasks
+        var subtaskDeleteButton = document.createElement("button");
+        subtaskDeleteButton.style.color = "white";
+        subtaskDeleteButton.style.backgroundColor = "black";
+        subtaskDeleteButton.innerHTML = "Delete";
+        subtaskDeleteButton.addEventListener("click", function () {
+            var mainTaskIndex = listOfItems.findIndex((task) => task.id === item.id);
+            if (mainTaskIndex !== -1) {
+                var subtaskIndex = listOfItems[mainTaskIndex].subtasks.findIndex((sub) => sub.id === subtask.id);
+                if (subtaskIndex !== -1) {
+                    listOfItems[mainTaskIndex].subtasks.splice(subtaskIndex, 1);
+                    render();
+                    saveListOfItemsToLocalStorage(); // Save changes to local storage
+                }
+            }
+        });
+
         var subtaskDoneButton = document.createElement("button");
         if (subtask.done) subtaskDoneButton.style.backgroundColor = "green";
         else subtaskDoneButton.style.backgroundColor = "red";
@@ -698,39 +727,35 @@ function createListItem(item) {
         if (subtask.done) subtaskDoneButton.innerHTML = "Done";
         else subtaskDoneButton.innerHTML = "Pending";
         subtaskDoneButton.addEventListener("click", function () {
-            subtask.done = !subtask.done; // Update the done state for the clicked subtask
-
-            // Find the main task (item) in the listOfItems array and update the corresponding subtask
-            const mainTaskIndex = listOfItems.findIndex(
-                (task) => task.id === item.id
-            );
-            if (mainTaskIndex !== -1) {
-                const subtaskIndex = listOfItems[
-                    mainTaskIndex
-                ].subtasks.findIndex((sub) => sub.id === subtask.id);
-                if (subtaskIndex !== -1) {
-                    listOfItems[mainTaskIndex].subtasks[subtaskIndex].done =
-                        subtask.done;
-                }
-            }
-
-            if (subtask.done) subtaskDoneButton.style.backgroundColor = "green";
-            else subtaskDoneButton.style.backgroundColor = "red";
-            if (subtask.done) subtaskDoneButton.innerHTML = "Done";
-            else subtaskDoneButton.innerHTML = "Pending";
+            subtask.done = !subtask.done;
             render();
-
-            var action = subtask.done
-                ? "Marked as Done for subtask"
-                : "Marked as Pending for subtask";
-            logActivity(action, subtask.text);
+            saveListOfItemsToLocalStorage(); // Save changes to local storage
         });
+
         var subtaskPara = document.createElement("p");
+        if (subtask.editing) {
+            subtaskEditButton.style.backgroundColor = "grey";
+            subtaskEditButton.innerHTML = "Save";
+            subtaskPara.contentEditable = true;
+            subtaskPara.addEventListener("input", function () {
+                subtask.text = subtaskPara.textContent.trim();
+                saveListOfItemsToLocalStorage(); // Save changes to local storage
+            });
+        }
+        else
+        {
+            subtaskEditButton.style.backgroundColor = "blue";
+            subtaskEditButton.innerHTML = "Edit";
+        }
         subtaskPara.textContent = subtask.text;
         subtaskPara.style.display = "inline";
 
-        subtaskContainer.appendChild(subtaskDoneButton);
+        var subtaskButtons = document.createElement('div');
         subtaskContainer.appendChild(subtaskPara);
+        subtaskButtons.appendChild(subtaskDeleteButton); // Add the delete button
+        subtaskButtons.appendChild(subtaskDoneButton);
+        subtaskButtons.appendChild(subtaskEditButton);
+        subtaskContainer.appendChild(subtaskButtons);
         subtasksDiv.appendChild(subtaskContainer);
     });
 
