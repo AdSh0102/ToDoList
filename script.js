@@ -276,7 +276,7 @@ render();
 count = listOfItems.length + 1;
 
 function newItemToAdd() {
-    newItem(newItemTextBox.value, priorityList.value, newItemDueDate.value);
+    newItem(newItemTextBox.value, newItemPriority.value, newItemDueDate.value);
 }
 
 pendingOnlyButton.addEventListener("click", function () {
@@ -521,6 +521,7 @@ function changeSortingAlgo() {
 function changePriority(value, id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
+            console.log(id);
             listOfItems[i].priority = value;
         }
     }
