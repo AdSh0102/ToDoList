@@ -503,3 +503,18 @@ select:disabled {
     background-color: #2f8203b0; /* Darker blue background color on hover */
   }
   
+
+  #addSubtaskButton2 {
+      background-color: #68da2b7a; /* Darker blue background color on hover */
+      color: #fff; /* Black text color */
+      border: none; /* Remove the button border */
+    padding: 10px 20px; /* Add padding to create some space around the text */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to a hand on hover */
+  }
+  
+  /* Add Subtask button hover effect */
+  #addSubtaskButton2:hover {
+      background-color: #414fe8b3; /* Brighter yellow background color */
+  }
+  

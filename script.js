@@ -137,10 +137,10 @@ function closeModal() {
 
 // Add event listener to the "Add Subtask" button
 var subtaskInput = document.getElementById("subtaskInput");
-var addSubtaskButton = document.getElementById("addSubtaskButton");
+var addSubtaskButton2 = document.getElementById("addSubtaskButton2");
 var closeModalButton = document.getElementById("closeModal");
 
-addSubtaskButton.addEventListener("click", function () {
+addSubtaskButton2.addEventListener("click", function () {
     var subtaskText = subtaskInput.value.trim();
     if (subtaskText !== "") {
         var mainTaskIndex = listToRender.findIndex(
@@ -154,6 +154,15 @@ addSubtaskButton.addEventListener("click", function () {
             });
             ++subtaskCounter;
             render();
+            // Log the subtask creation activity
+            var logEntry = {
+                timestamp: new Date().toISOString(),
+                action: "Add Subtask",
+                task: listOfItems[mainTaskIndex].text,
+                subtask: subtaskText,
+            };
+            log.push(logEntry);
+            localStorage.setItem("log", JSON.stringify(log));
         }
     }
     subtaskInput.value = "";
@@ -258,7 +267,6 @@ function logActivity(action, task) {
     };
 
     // Store log in local storage
-    var log = JSON.parse(localStorage.getItem("log")) || [];
     log.push(logEntry);
     localStorage.setItem("log", JSON.stringify(log));
 }
@@ -301,17 +309,6 @@ submitButton.addEventListener("click", function () {
     closeToDoPalette();
 });
 
-newItemTextBox.addEventListener(
-    "keydown",
-    (event) => {
-        var name = event.key;
-        if (name == "Enter") {
-            newItemToAdd();
-        }
-    },
-    false
-);
-
 // Function to retrieve the listOfItems from Local Storage
 function getlistOfItemsFromLocalStorage() {
     var storedList = localStorage.getItem("listOfItems");
@@ -339,6 +336,8 @@ function dueDateSortingFunction(a, b) {
 function renderAll() {
     filterToDoItems["pending"] = false;
     filterToDoItems["missed"] = false;
+    filterCategories = [];
+    filterTags = [];
     render();
 }
 
@@ -403,6 +402,7 @@ searchBox.addEventListener("keypress", function (event) {
     if (event.key != "Enter") return;
     searchInput = searchBox.value;
     search();
+    searchBox.value = "";
 });
 
 function search() {
@@ -733,6 +733,16 @@ function createListItem(item) {
                     (curr) => subtask.id === curr.id
                 );
                 listOfItems[index].subtasks[index2].text = val;
+                // Log the subtask editing activity
+                var logEntry = {
+                    timestamp: new Date().toISOString(),
+                    action: "Edit Subtask",
+                    task: item.text,
+                    subtask: subtask.text,
+                    editedTo: val,
+                };
+                log.push(logEntry);
+                localStorage.setItem("log", JSON.stringify(log));
             }
             render();
             saveListOfItemsToLocalStorage(); // Save changes to local storage
@@ -755,6 +765,15 @@ function createListItem(item) {
                     listOfItems[mainTaskIndex].subtasks.splice(subtaskIndex, 1);
                     render();
                     saveListOfItemsToLocalStorage(); // Save changes to local storage
+                    // Log the subtask deletion activity
+                    var logEntry = {
+                        timestamp: new Date().toISOString(),
+                        action: "Delete Subtask",
+                        task: item.text,
+                        subtask: subtask.text,
+                    };
+                    log.push(logEntry);
+                    localStorage.setItem("log", JSON.stringify(log));
                 }
             }
         });
@@ -767,6 +786,7 @@ function createListItem(item) {
         else subtaskDoneButton.innerHTML = "Pending";
         subtaskDoneButton.addEventListener("click", function () {
             subtask.done = !subtask.done;
+            logActivity()
             render();
             saveListOfItemsToLocalStorage(); // Save changes to local storage
         });
@@ -822,7 +842,7 @@ function newItem(val, priorityVal, dueDateVal) {
             dueDateVal = formattedDueDate;
         }
     }
-    var newItem = {
+    var newItemTemp = {
         id: count,
         text: val,
         done: false,
@@ -834,7 +854,7 @@ function newItem(val, priorityVal, dueDateVal) {
         subtasks: [],
     };
     count += 1;
-    listOfItems.push(newItem);
+    listOfItems.push(newItemTemp);
     render();
     logActivity("Add", `"${val}" task added.`);
     newItemTextBox.value = "";
