@@ -570,6 +570,8 @@ function createListItem(item) {
     var subtasksDiv = document.createElement("div");
 
     subtasksDiv.className = "subtasks";
+
+    addSubtaskButton.classList.add("addSubtaskButton");
     addSubtaskButton.textContent = "Add Subtask";
     addSubtaskButton.addEventListener("click", function () {
         currentTaskId = item.id; // Set the current main task ID
@@ -702,7 +704,7 @@ function createListItem(item) {
     });
 
     if (priorityList.value == "Low") {
-        element.style.backgroundColor = "#28a745";
+        element.style.backgroundColor = "#7ead89";
     } else if (priorityList.value == "High") {
         element.style.backgroundColor = "#f44336";
     } else {
