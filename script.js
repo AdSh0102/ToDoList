@@ -179,6 +179,7 @@ filterTasksByCategoriesInput.addEventListener("keypress", function (event) {
         } else {
             var temp = filterTasksByCategoriesInput.value;
             filterCategories.push(temp);
+            filterTasksByCategoriesInput.value = "";
             render();
         }
     }
@@ -190,6 +191,7 @@ filterTasksByTagsInput.addEventListener("keypress", function (event) {
             return;
         } else {
             filterTags.push(filterTasksByTagsInput.value);
+            filterTasksByTagsInput.value = "";
             render();
         }
     }
@@ -296,6 +298,7 @@ displayMissedTasks.addEventListener("click", function () {
 
 submitButton.addEventListener("click", function () {
     newItemToAdd();
+    closeToDoPalette();
 });
 
 newItemTextBox.addEventListener(
@@ -359,24 +362,33 @@ function renderList(listToRender) {
 function render() {
     currDateTime = formatDateToDatetimeLocal(new Date());
     listToRender = [];
+    console.log(startDateTime.value, endDateTime.value);
     for (var i = 0; i < listOfItems.length; ++i) {
-        if (
-            filterToDoItems["missed"] &&
-            (listOfItems[i].done || listOfItems[i].dueDate > currDateTime)
-        )
+        if (filterToDoItems["missed"] && (listOfItems[i].done || listOfItems[i].dueDate > currDateTime))
+        {
             continue;
-        if (filterToDoItems["pending"] && listOfItems[i].done) continue;
-        if (startDateTime.value == "" && endDateTime.value == "")
+        }
+        if (filterToDoItems["pending"] && listOfItems[i].done) 
+        {
+            continue;
+        }
+        currDateTime = listOfItems[i].dueDate;
+        if (startDateTime.value === "" && endDateTime.value === "")
+        {
             listToRender.push(listOfItems[i]);
+        }
         else if (startDateTime.value == "" && endDateTime.value >= currDateTime)
+        {
             listToRender.push(listOfItems[i]);
+        }
         else if (endDateTime.value == "" && startDateTime.value <= currDateTime)
+        {
             listToRender.push(listOfItems[i]);
-        else if (
-            startDateTime.value <= currDateTime &&
-            endDateTime.value >= currDateTime
-        )
+        }
+        else if (startDateTime.value <= currDateTime && endDateTime.value >= currDateTime)
+        {
             listToRender.push(listOfItems[i]);
+        }
     }
     listToRender.sort(sortingFunction);
     filterByTags();
@@ -594,7 +606,7 @@ function createListItem(item) {
     dueDateDiv.appendChild(dueDateLabel);
     dueDateDiv.append(dueDate);
     dueDateLabel.setAttribute("for", "dueDate");
-    dueDateLabel.innerHTML = "Due Date for this task: ";
+    dueDateLabel.innerHTML = "Due Date: ";
 
     buttons.appendChild(delButton);
     buttons.appendChild(doneButton);
@@ -610,6 +622,7 @@ function createListItem(item) {
     {
         var subtaskHeading = document.createElement('h3');
         subtaskHeading.innerHTML = "Subtasks";
+        subtaskHeading.style.margin = "10px";
         element.append(subtaskHeading);
     }
     element.appendChild(subtasksDiv);
@@ -692,13 +705,14 @@ function createListItem(item) {
     } else if (priorityList.value == "High") {
         element.style.backgroundColor = "#f44336";
     } else {
-        element.style.backgroundColor = "#28a745";
+        element.style.backgroundColor = "#ffc107";
     }
+    element.style.borderColor = element.style.backgroundColor;
 
     item.subtasks.forEach((subtask) => {
         var subtaskContainer = document.createElement("div");
         subtaskContainer.className = "subtask-container";
-
+        subtaskContainer.style.width = "300px";
         // Add edit functionality for subtasks
         var subtaskEditButton = document.createElement("button");
         subtaskEditButton.style.color = "white";
@@ -706,7 +720,14 @@ function createListItem(item) {
         subtaskEditButton.innerHTML = "Edit";
         subtaskEditButton.addEventListener("click", function () {
             subtask.editing = !subtask.editing;
-            subtaskPara.readOnly = !subtaskPara.readOnly; 
+            subtaskPara.readOnly = !subtaskPara.readOnly;
+            var val = subtaskPara.value;
+            if(!subtask.editing)
+            {
+                var index = listOfItems.findIndex((task) => task.id === item.id);
+                var index2 = listOfItems[index].subtasks.findIndex((curr) => subtask.id === curr.id);
+                listOfItems[index].subtasks[index2].text = val;
+            }
             render();
             saveListOfItemsToLocalStorage(); // Save changes to local storage
         });
@@ -761,7 +782,7 @@ function createListItem(item) {
         subtaskPara.style.backgroundColor = "white";
         subtaskPara.style.display = "initial";
         subtaskPara.style.height = "fit-content";
-        subtaskPara.style.width = "100px";
+        subtaskPara.style.width = "300px";
         subtaskPara.style.borderRadius = "5px";
         subtaskPara.style.border = "5px solid transparent";
         subtaskPara.style.resize = "none";
