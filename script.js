@@ -493,6 +493,7 @@ function changeSortingAlgo() {
 function changePriority(value, id) {
     for (var i = 0; i < listOfItems.length; ++i) {
         if (listOfItems[i].id == id) {
+            console.log(id);
             listOfItems[i].priority = value;
         }
     }
@@ -539,7 +540,6 @@ function createListItem(item) {
     var addTagBox = document.createElement("input");
     var addSubtaskButton = document.createElement("button");
     var subtasksDiv = document.createElement("div");
-    var draggedSubtask = null;
 
     subtasksDiv.className = "subtasks";
 
@@ -687,19 +687,11 @@ function createListItem(item) {
     item.subtasks.forEach((subtask) => {
         var subtaskContainer = document.createElement("div");
         subtaskContainer.className = "subtask-container";
-        subtaskContainer.dataset.mainTaskId = item.id;
-        subtaskContainer.setAttribute("draggable", "true");
-        subtaskContainer.dataset.subtaskId = subtask.id;
         subtaskContainer.style.width = "300px";
         var subtaskEditButton = document.createElement("button");
         subtaskEditButton.style.color = "white";
         subtaskEditButton.style.backgroundColor = "blue";
         subtaskEditButton.innerHTML = "Edit";
-        subtaskContainer.addEventListener("dragstart", handleSubtaskDragStart);
-        subtaskContainer.addEventListener("dragenter", handleSubtaskDragEnter);
-        subtaskContainer.addEventListener("dragleave", handleSubtaskDragLeave);
-        subtaskContainer.addEventListener("dragover", handleSubtaskDragOver);
-        subtaskContainer.addEventListener("drop", handleSubtaskDrop);
         subtaskEditButton.addEventListener("click", function () {
             subtask.editing = !subtask.editing;
             subtaskPara.readOnly = !subtaskPara.readOnly;
@@ -906,26 +898,34 @@ document.getElementById("createToDo").addEventListener("click", function () {
 initialize();
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Variables to store the dragged task and the drop target
     let draggedTask = null;
     let dropTarget = null;
 
+    // Add dragstart event listener to the task divs
     document.addEventListener("dragstart", function (event) {
+        // Set the data (taskId) to be transferred during the drag
         event.dataTransfer.setData("text/plain", event.target.id);
+        // Store the dragged task
         draggedTask = event.target;
     });
 
+    // Add dragenter event listener to the drop zone (listOfToDoItems)
     listOfToDoItems.addEventListener("dragenter", function (event) {
         event.preventDefault();
+        // Set the drop target
         dropTarget = event.target;
     });
 
+    // Add dragover event listener to the drop zone (listOfToDoItems)
     listOfToDoItems.addEventListener("dragover", function (event) {
         event.preventDefault();
-        var rect = listOfToDoItems.getBoundingClientRect();
-        var offset = event.clientY - rect.top;
-        var height = rect.bottom - rect.top;
-        var scrollThreshold = 50;
-        var scrollSpeed = 10;
+        // Scroll the list of tasks if needed
+        const rect = listOfToDoItems.getBoundingClientRect();
+        const offset = event.clientY - rect.top;
+        const height = rect.bottom - rect.top;
+        const scrollThreshold = 50;
+        const scrollSpeed = 10;
 
         if (offset < scrollThreshold) {
             listOfToDoItems.scrollTop -= scrollSpeed;
@@ -934,72 +934,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Add drop event listener to the drop zone (listOfToDoItems)
     listOfToDoItems.addEventListener("drop", function (event) {
         event.preventDefault();
-        var taskId = event.dataTransfer.getData("text/plain");
-        var taskDiv = document.getElementById(taskId);
-        var dropTargetIndex = Array.from(listOfToDoItems.children).indexOf(
-            dropTarget
-        );
+        // Get the taskId from the data transfer
+        const taskId = event.dataTransfer.getData("text/plain");
+        // Find the task div by its ID
+        const taskDiv = document.getElementById(taskId);
+        // Get the index of the drop target task
+        const dropTargetIndex = Array.from(listOfToDoItems.children).indexOf(dropTarget);
 
-        var draggedTaskIndex = Array.from(listOfToDoItems.children).indexOf(
-            draggedTask
-        );
+        // Check if the task is dropped above or below the drop target
+        const draggedTaskIndex = Array.from(listOfToDoItems.children).indexOf(draggedTask);
         if (draggedTaskIndex < dropTargetIndex) {
-            listOfToDoItems.insertBefore(taskDiv - 1, dropTarget.nextSibling);
+            // Move the task div below the drop target
+            listOfToDoItems.insertBefore(taskDiv, dropTarget.nextSibling);
         } else {
+            // Move the task div above the drop target
             listOfToDoItems.insertBefore(taskDiv, dropTarget);
         }
+        // Clear the drop target and dragged task
         dropTarget = null;
         draggedTask = null;
     });
 });
-
-function handleSubtaskDragStart(event) {
-    draggedSubtask = event.target;
-    event.dataTransfer.setData("text/plain", event.target.id);
-    var mainTaskId = event.target.dataset.mainTaskId;
-    event.dataTransfer.setData("text/plain", mainTaskId);
-}
-
-function handleSubtaskDragEnter(event) {
-    event.preventDefault();
-    event.target.style.backgroundColor = "lightgray";
-}
-
-function handleSubtaskDragLeave(event) {
-    event.target.style.backgroundColor = "";
-}
-
-function handleSubtaskDragOver(event) {
-    event.preventDefault();
-}
-
-function handleSubtaskDrop(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.target.style.backgroundColor = "";
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.target.style.backgroundColor = "";
-    var mainTaskId = draggedSubtask.getAttribute("data-main-task-id") - 1;
-    var subtaskId = draggedSubtask.id;
-    for(var i=0;i<listOfItems[mainTaskId-1].subtasks.length;++i)
-    {
-        if(subtaskId == listOfItems[mainTaskId-1].subtasks[i].id)
-        {
-            subtaskId = i;
-            break;
-        }
-    }
-    if (mainTaskId !== -1 && subtaskId !== -1) {
-        var [subtask] = listOfItems[mainTaskId].subtasks.splice(subtaskId, 1);
-        var newIndex = Array.from(event.target.parentElement.children).indexOf(
-            event.target
-        );
-        listOfItems[mainTaskId].subtasks.splice(newIndex, 0, subtask);
-        render();
-        saveListOfItemsToLocalStorage();
-    }
-}
