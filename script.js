@@ -29,6 +29,7 @@ var listToRender = [];
 var currentTaskId = null; // Track the ID of the current main task being processed
 var subtaskCounter = 1;
 var searchInput = null;
+var reminders = [];
 nlp.plugin(compromiseDates); // load the plugin
 
 function extractDueDate(input) {
@@ -38,6 +39,89 @@ function extractDueDate(input) {
     // return the text
     return dates ? new Date(dates.end) : null;
 }
+
+// Function to handle reminder creation
+function createReminder() {
+    // Show the palette/modal to capture reminder details
+    openReminderPalette();
+}
+
+// Function to open the reminder palette/modal
+function openReminderPalette() {
+    var reminderPalette = document.getElementById("reminderPalette");
+    reminderPalette.style.display = "block";
+}
+
+// Function to save the reminder
+function saveReminder() {
+    var reminderText = document.getElementById("reminderText").value;
+    var reminderDate = document.getElementById("reminderDate").value;
+    
+    // Perform any necessary validation on the reminderText and reminderDate
+    if (reminderDate == "") {
+        reminderDate = extractDueDate(reminderDate);
+        if (reminderDate != null)
+            reminderDate = formatDateToDatetimeLocal(reminderDate);
+        if (reminderDate == null) {
+            var currentDate = new Date();
+            var dueDateObject = new Date(currentDate);
+            dueDateObject.setDate(dueDateObject.getDate() + 7);
+            var formattedDueDate = formatDateToDatetimeLocal(dueDateObject);
+            reminderDate = formattedDueDate;
+        }
+    }
+
+    // Create a new reminder object and store it somewhere (e.g., an array)
+    var newReminder = {
+        id: reminders.length + 1,
+        text: reminderText,
+        date: reminderDate,
+    };
+
+    // Add the new reminder to the reminders array
+    reminders.push(newReminder);
+
+    // Save the reminders array to local storage
+    localStorage.setItem("reminders", JSON.stringify(reminders));
+
+    // Log the reminder creation activity
+    var logEntry = {
+        timestamp: new Date().toISOString(),
+        action: "Add Reminder",
+        reminder: newReminder.text,
+    };
+    log.push(logEntry);
+    localStorage.setItem("log", JSON.stringify(log));
+
+    // Close the reminder palette/modal
+    closeReminderPalette();
+}
+
+// Function to cancel the reminder creation
+function cancelReminder() {
+    closeReminderPalette();
+}
+
+// Function to close the reminder palette/modal
+function closeReminderPalette() {
+    var reminderPalette = document.getElementById("reminderPalette");
+    reminderPalette.style.display = "none";
+}
+
+// Add event listeners for the "Save Reminder" and "Cancel" buttons
+document
+    .getElementById("saveReminderButton")
+    .addEventListener("click", saveReminder);
+document
+    .getElementById("cancelReminderButton")
+    .addEventListener("click", cancelReminder);
+
+// Add event listener to the "Create Reminder" button
+document
+    .getElementById("createReminderButton")
+    .addEventListener("click", function () {
+        openReminderPalette();
+    });
 
 // Function to open the modal
 function openModal() {
@@ -300,7 +384,7 @@ function render() {
 }
 
 searchBox.addEventListener("keypress", function (event) {
-    if (key != "Enter") return;
+    if (event.key != "Enter") return;
     searchInput = searchBox.value;
     search();
 });
@@ -317,10 +401,6 @@ function search() {
             return true;
         var okay = 0;
         task.subtasks.forEach((subtask) => {
-            console.log(
-                subtask.text.toLowerCase(),
-                subtask.text.toLowerCase().includes(searchInput.toLowerCase())
-            );
             if (subtask.text.toLowerCase().includes(searchInput.toLowerCase()))
                 okay = 1;
         });
@@ -689,3 +769,54 @@ function newItem(val, priorityVal, dueDateVal) {
     logActivity("Add", `"${val}" task added.`);
     newItemTextBox.value = "";
 }
+
+function loadRemindersFromLocalStorage() {
+    var storedReminders = localStorage.getItem("reminders");
+    reminders = storedReminders ? JSON.parse(storedReminders) : [];
+}
+
+// Function to check for due reminders and send alerts
+function checkReminders() {
+    var currentDate = new Date();
+    var currentTime = currentDate.getTime();
+
+    // Create an array to store the IDs of triggered reminders
+    var triggeredReminderIds = [];
+
+    reminders.forEach(function (reminder) {
+        var reminderDate = new Date(reminder.date);
+        var reminderTime = reminderDate.getTime();
+
+        // If the reminder date has passed and it has not triggered an alert yet
+        if (reminderTime <= currentTime && !triggeredReminderIds.includes(reminder.id)) {
+            // Show the alert for the reminder
+            alert("Reminder: " + reminder.text);
+
+            // Add the ID of the triggered reminder to the array
+            triggeredReminderIds.push(reminder.id);
+        }
+    });
+
+    // Remove the triggered reminders from the reminders array
+    reminders = reminders.filter(function (reminder) {
+        return !triggeredReminderIds.includes(reminder.id);
+    });
+
+    // Save the updated reminders array to local storage
+    saveRemindersToLocalStorage();
+}
+
+// Function to save the reminders array to Local Storage
+function saveRemindersToLocalStorage() {
+    localStorage.setItem("reminders", JSON.stringify(reminders));
+}
+
+// Function to initialize the application
+function initialize() {
+    loadRemindersFromLocalStorage();
+    // Call the checkReminders function every minute (adjust the interval as needed)
+    setInterval(checkReminders, 30000); // 60000 milliseconds = 1 minute
+}
+
+// Call the initialize function to start the application
+initialize();
