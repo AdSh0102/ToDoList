@@ -26,38 +26,31 @@ var filterTasksByCategoriesInput = document.getElementById(
 var searchBox = document.getElementById("searchInput");
 var filterTasksByTagsInput = document.getElementById("filterTasksByTags");
 var listToRender = [];
-var currentTaskId = null; // Track the ID of the current main task being processed
+var currentTaskId = null;
 var subtaskCounter = 1;
 var searchInput = null;
 var reminders = [];
-nlp.plugin(compromiseDates); // load the plugin
+nlp.plugin(compromiseDates);
 
 function extractDueDate(input) {
     var doc = nlp(input);
-    // find and interpret each date in the text
     var dates = doc.dates().get()[0];
-    // return the text
     return dates ? new Date(dates.end) : null;
 }
 
-// Function to handle reminder creation
 function createReminder() {
-    // Show the palette/modal to capture reminder details
     openReminderPalette();
 }
 
-// Function to open the reminder palette/modal
 function openReminderPalette() {
     var reminderPalette = document.getElementById("reminderPalette");
     reminderPalette.style.display = "block";
 }
 
-// Function to save the reminder
 function saveReminder() {
     var reminderText = document.getElementById("reminderText").value;
     var reminderDate = document.getElementById("reminderDate").value;
 
-    // Perform any necessary validation on the reminderText and reminderDate
     if (reminderDate == "") {
         reminderDate = extractDueDate(reminderDate);
         if (reminderDate != null)
@@ -71,20 +64,16 @@ function saveReminder() {
         }
     }
 
-    // Create a new reminder object and store it somewhere (e.g., an array)
     var newReminder = {
         id: reminders.length + 1,
         text: reminderText,
         date: reminderDate,
     };
 
-    // Add the new reminder to the reminders array
     reminders.push(newReminder);
 
-    // Save the reminders array to local storage
     localStorage.setItem("reminders", JSON.stringify(reminders));
 
-    // Log the reminder creation activity
     var logEntry = {
         timestamp: new Date().toISOString(),
         action: "Add Reminder",
@@ -93,22 +82,18 @@ function saveReminder() {
     log.push(logEntry);
     localStorage.setItem("log", JSON.stringify(log));
 
-    // Close the reminder palette/modal
     closeReminderPalette();
 }
 
-// Function to cancel the reminder creation
 function cancelReminder() {
     closeReminderPalette();
 }
 
-// Function to close the reminder palette/modal
 function closeReminderPalette() {
     var reminderPalette = document.getElementById("reminderPalette");
     reminderPalette.style.display = "none";
 }
 
-// Add event listeners for the "Save Reminder" and "Cancel" buttons
 document
     .getElementById("saveReminderButton")
     .addEventListener("click", saveReminder);
@@ -116,26 +101,22 @@ document
     .getElementById("cancelReminderButton")
     .addEventListener("click", cancelReminder);
 
-// Add event listener to the "Create Reminder" button
 document
     .getElementById("createReminderButton")
     .addEventListener("click", function () {
         openReminderPalette();
     });
 
-// Function to open the modal
 function openModal() {
     var modal = document.getElementById("modal");
     modal.style.display = "block";
 }
 
-// Function to close the modal
 function closeModal() {
     var modal = document.getElementById("modal");
     modal.style.display = "none";
 }
 
-// Add event listener to the "Add Subtask" button
 var subtaskInput = document.getElementById("subtaskInput");
 var addSubtaskButton2 = document.getElementById("addSubtaskButton2");
 var closeModalButton = document.getElementById("closeModal");
@@ -154,7 +135,6 @@ addSubtaskButton2.addEventListener("click", function () {
             });
             ++subtaskCounter;
             render();
-            // Log the subtask creation activity
             var logEntry = {
                 timestamp: new Date().toISOString(),
                 action: "Add Subtask",
@@ -238,21 +218,18 @@ function filterByPriority(priority) {
     renderList(filteredTasks);
 }
 
-// Event listener for the "High Priority" button
 document
     .getElementById("filterHighPriority")
     .addEventListener("click", function () {
         filterByPriority("High");
     });
 
-// Event listener for the "Medium Priority" button
 document
     .getElementById("filterMediumPriority")
     .addEventListener("click", function () {
         filterByPriority("Medium");
     });
 
-// Event listener for the "Low Priority" button
 document
     .getElementById("filterLowPriority")
     .addEventListener("click", function () {
@@ -266,7 +243,6 @@ function logActivity(action, task) {
         task,
     };
 
-    // Store log in local storage
     log.push(logEntry);
     localStorage.setItem("log", JSON.stringify(log));
 }
@@ -309,13 +285,11 @@ submitButton.addEventListener("click", function () {
     closeToDoPalette();
 });
 
-// Function to retrieve the listOfItems from Local Storage
 function getlistOfItemsFromLocalStorage() {
     var storedList = localStorage.getItem("listOfItems");
     return storedList ? JSON.parse(storedList) : [];
 }
 
-// Function to save the listOfItems to Local Storage
 function saveListOfItemsToLocalStorage() {
     localStorage.setItem("listOfItems", JSON.stringify(listOfItems));
 }
@@ -407,11 +381,9 @@ searchBox.addEventListener("keypress", function (event) {
 
 function search() {
     if (searchInput.length == 0) {
-        // If the search input is empty, show all tasks
         return;
     }
 
-    // Search for tasks with names similar to the search input
     var filteredTasks = listOfItems.filter((task) => {
         if (task.text.toLowerCase().includes(searchInput.toLowerCase()))
             return true;
@@ -553,7 +525,6 @@ function addTagToItem(val, id) {
     render();
 }
 
-// function to create a new To Do List item
 function createListItem(item) {
     var element = document.createElement("div");
     var para = document.createElement("textarea");
@@ -575,7 +546,7 @@ function createListItem(item) {
     addSubtaskButton.classList.add("addSubtaskButton");
     addSubtaskButton.textContent = "Add Subtask";
     addSubtaskButton.addEventListener("click", function () {
-        currentTaskId = item.id; // Set the current main task ID
+        currentTaskId = item.id;
         openModal();
     });
     element.appendChild(addSubtaskButton);
@@ -673,7 +644,7 @@ function createListItem(item) {
         para.readOnly = false;
         editButton.style.backgroundColor = "grey";
         editButton.innerHTML = "Save";
-        para.focus(); // Add this line to focus on the textarea when in editing mode
+        para.focus();
     } else {
         para.readOnly = true;
         editButton.style.backgroundColor = "blue";
@@ -717,7 +688,6 @@ function createListItem(item) {
         var subtaskContainer = document.createElement("div");
         subtaskContainer.className = "subtask-container";
         subtaskContainer.style.width = "300px";
-        // Add edit functionality for subtasks
         var subtaskEditButton = document.createElement("button");
         subtaskEditButton.style.color = "white";
         subtaskEditButton.style.backgroundColor = "blue";
@@ -734,7 +704,6 @@ function createListItem(item) {
                     (curr) => subtask.id === curr.id
                 );
                 listOfItems[index].subtasks[index2].text = val;
-                // Log the subtask editing activity
                 var logEntry = {
                     timestamp: new Date().toISOString(),
                     action: "Edit Subtask",
@@ -746,10 +715,9 @@ function createListItem(item) {
                 localStorage.setItem("log", JSON.stringify(log));
             }
             render();
-            saveListOfItemsToLocalStorage(); // Save changes to local storage
+            saveListOfItemsToLocalStorage();
         });
 
-        // Add delete functionality for subtasks
         var subtaskDeleteButton = document.createElement("button");
         subtaskDeleteButton.style.color = "white";
         subtaskDeleteButton.style.backgroundColor = "black";
@@ -765,8 +733,7 @@ function createListItem(item) {
                 if (subtaskIndex !== -1) {
                     listOfItems[mainTaskIndex].subtasks.splice(subtaskIndex, 1);
                     render();
-                    saveListOfItemsToLocalStorage(); // Save changes to local storage
-                    // Log the subtask deletion activity
+                    saveListOfItemsToLocalStorage();
                     var logEntry = {
                         timestamp: new Date().toISOString(),
                         action: "Delete Subtask",
@@ -787,9 +754,9 @@ function createListItem(item) {
         else subtaskDoneButton.innerHTML = "Pending";
         subtaskDoneButton.addEventListener("click", function () {
             subtask.done = !subtask.done;
-            logActivity()
+            logActivity();
             render();
-            saveListOfItemsToLocalStorage(); // Save changes to local storage
+            saveListOfItemsToLocalStorage();
         });
 
         var subtaskPara = document.createElement("textarea");
@@ -799,7 +766,7 @@ function createListItem(item) {
             subtaskPara.readOnly = false;
             subtaskPara.addEventListener("input", function () {
                 subtask.text = subtaskPara.textContent;
-                saveListOfItemsToLocalStorage(); // Save changes to local storage
+                saveListOfItemsToLocalStorage();
             });
         } else {
             subtaskPara.readOnly = true;
@@ -818,7 +785,7 @@ function createListItem(item) {
 
         var subtaskButtons = document.createElement("div");
         subtaskContainer.appendChild(subtaskPara);
-        subtaskButtons.appendChild(subtaskDeleteButton); // Add the delete button
+        subtaskButtons.appendChild(subtaskDeleteButton);
         subtaskButtons.appendChild(subtaskDoneButton);
         subtaskButtons.appendChild(subtaskEditButton);
         subtaskContainer.appendChild(subtaskButtons);
@@ -828,7 +795,6 @@ function createListItem(item) {
     return element;
 }
 
-// function to add a new item to the toDo List
 function newItem(val, priorityVal, dueDateVal) {
     if (regex.test(val)) return;
     if (dueDateVal == "") {
@@ -866,84 +832,65 @@ function loadRemindersFromLocalStorage() {
     reminders = storedReminders ? JSON.parse(storedReminders) : [];
 }
 
-// Function to check for due reminders and send alerts
 function checkReminders() {
     var currentDate = new Date();
     var currentTime = currentDate.getTime();
 
-    // Create an array to store the IDs of triggered reminders
     var triggeredReminderIds = [];
 
     reminders.forEach(function (reminder) {
         var reminderDate = new Date(reminder.date);
         var reminderTime = reminderDate.getTime();
 
-        // If the reminder date has passed and it has not triggered an alert yet
         if (
             reminderTime <= currentTime &&
             !triggeredReminderIds.includes(reminder.id)
         ) {
-            // Show the alert for the reminder
             alert("Reminder: " + reminder.text);
-
-            // Add the ID of the triggered reminder to the array
             triggeredReminderIds.push(reminder.id);
         }
     });
 
-    // Remove the triggered reminders from the reminders array
     reminders = reminders.filter(function (reminder) {
         return !triggeredReminderIds.includes(reminder.id);
     });
 
-    // Save the updated reminders array to local storage
     saveRemindersToLocalStorage();
 }
 
-// Function to save the reminders array to Local Storage
 function saveRemindersToLocalStorage() {
     localStorage.setItem("reminders", JSON.stringify(reminders));
 }
 
-// Function to initialize the application
 function initialize() {
     loadRemindersFromLocalStorage();
-    // Call the checkReminders function every minute (adjust the interval as needed)
-    setInterval(checkReminders, 30000); // 60000 milliseconds = 1 minute
+    setInterval(checkReminders, 30000);
 }
 
-// Function to handle to-do task creation
 function createToDoTask() {
-    // Show the palette/modal to capture to-do task details
     openToDoPalette();
 }
 
-// Function to open the to-do task palette/modal
 function openToDoPalette() {
     var toDoPalette = document.getElementById("toDoPalette");
     toDoPalette.style.display = "block";
 }
 
-// Function to cancel the to-do task creation
 function cancelToDoTask() {
     closeToDoPalette();
 }
 
-// Function to close the to-do task palette/modal
 function closeToDoPalette() {
     var toDoPalette = document.getElementById("toDoPalette");
     toDoPalette.style.display = "none";
 }
 
-// Add event listeners for the "Press to submit" and "Cancel" buttons in the to-do palette
 document
     .getElementById("cancelToDoButton")
     .addEventListener("click", cancelToDoTask);
 
-// Add event listener to the "Create a new to do task" button
 document.getElementById("createToDo").addEventListener("click", function () {
     createToDoTask();
 });
 
-// Call the initialize function to start the application
 initialize();
